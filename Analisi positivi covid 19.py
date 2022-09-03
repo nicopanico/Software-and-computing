@@ -59,7 +59,10 @@ positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
 
 # In[5]:
 
-
+t=[]
+for i in range(1,5):
+    t.append(i)
+    
 positivi_unibo.DATA_ESITO.isna().value_counts()
 
 
@@ -218,7 +221,7 @@ for i in range(0, len(dataset_tracking_bologna_positives.index)):
     if 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'SUB INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA COVID BASSA INTENSITA' in dataset_tracking_bologna_positives['SETTING'].iloc[i]:
         isPoscov.append(i)
 dataset_pos_bolo_no_cov=dataset_tracking_bologna_positives.drop(isPoscov)
-
+#all patients with are not in covid settings
 
 # FIRST contingency
 
@@ -402,7 +405,7 @@ for i in range(0, len(test_2.index)):
 # Creating the datafarame for the Kaplan-Meier
 
 # In[20]:
-
+#the sex is set to be 1 for male and 0 for female, so the column of the sex is binary
 
 
 keplan_meier_db=pd.DataFrame(columns=['ID_PER','Giorni','Età','Intensiva'])
@@ -492,7 +495,7 @@ print(kfm.event_table)
 kfm.plot(ci_show=True)
 plt.xlabel('Number of days before covid intensive care')
 plt.ylabel('Probability of survival')
-plt.savefig('C:/Users/nicop/Desktop/KM')
+# plt.savefig('C:/Users/nicop/Desktop/KM')
 print(kfm.survival_function_,'\n','Median survival time:',kfm.median_survival_time_)
 
 
@@ -502,7 +505,7 @@ print(kfm.survival_function_,'\n','Median survival time:',kfm.median_survival_ti
 kfm.plot_cumulative_density()
 plt.xlabel('Number of days before covid intensive care')
 plt.ylabel('Probability of going in intensive care')
-plt.savefig('C:/Users/nicop/Desktop/KM2')
+# plt.savefig('C:/Users/nicop/Desktop/KM2')
 
 
 # In[53]:
@@ -520,7 +523,7 @@ kfm.fit(keplan_meier_db['Giorni'][i2], keplan_meier_db['Intensiva'][i2], label='
 plt.title('Survival curve for males and females')
 plt.ylabel('Probability not to go in covid intensive care')
 kfm.plot(ax=a1,ci_show=False)
-plt.savefig('C:/Users/nicop/Desktop/KM_sex')
+# plt.savefig('C:/Users/nicop/Desktop/KM_sex')
 
 
 # # Cox-Hazard regression
