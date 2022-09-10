@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
 
-
+##importing packages used in the script
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,19 +11,13 @@ import scipy.stats as st
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
-
-
-# In[2]:
-
-
 import sys
 get_ipython().system('{sys.executable} -m pip install lifelines')
 
 
-# # opening the csv files
 
-# In[3]:
-
+# # OPENING THE CSV FILES
+# main datasets used for the script
 
 anag_comune_bo=pd.read_csv('./Desktop/Progetto_biology/Primo_upload/ANAGCOMUNEBO.csv')
 positivi_unibo=pd.read_csv('./Desktop/Progetto_biology/Casi_covid_unibo_2021-11-22.csv',';')
@@ -53,26 +46,18 @@ positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZ
 positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
 
 
-# # Check on the database 'casi covid unibo'
+# # Check on the database 'casi covid unibo' to make sure everything is matching in the database
 
 # Removing the people that still have covid at the moment
-
-# In[5]:
-
-t=[]
-for i in range(1,5):
-    t.append(i)
-    
-positivi_unibo.DATA_ESITO.isna().value_counts()
+#since the analysis is performed over the patients who have a complete track (start and end)
 
 
-# In[6]:
+#dataset matching
 
-
-positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts()
-
-
-# In[7]:
+still_sick=positivi_unibo.DATA_ESITO.isna().value_counts() #patients still not healthy
+still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts() #patients who still have covid
+#check if this 2 groups are the same (they should be)
+if len(still_sick)=len(still_pos):
 
 
 iscovidnow=[]
