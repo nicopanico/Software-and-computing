@@ -11,30 +11,32 @@ import scipy.stats as st
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
+import my_functions
 import sys
 get_ipython().system('{sys.executable} -m pip install lifelines')
 
 
 
 # # OPENING THE CSV FILES
-# main datasets used for the script
+# main datasets used for the script it could require time
 
 anag_comune_bo=pd.read_csv('./Desktop/Progetto_biology/Primo_upload/ANAGCOMUNEBO.csv')
 positivi_unibo=pd.read_csv('./Desktop/Progetto_biology/Casi_covid_unibo_2021-11-22.csv',';')
+positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZIONE'])
+positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
 analysis_entries_updated=pd.read_csv('./Desktop/Progetto_biology/Secondo_upload/ANALISI_ENTRATE_2021_10_13.csv',';')
 analysis_entries_updated['DATA_INIZIO']=pd.to_datetime(analysis_entries_updated['DATA_INIZIO'])
+analysis_entries_updated=analysis_entries_updated.fillna(0)
 analisi_uscite_updated=pd.read_csv('./Desktop/Progetto_biology/Secondo_upload/ANALISI_USCITE_2021_10_13.csv',';')
 analisi_uscite_updated['DATA_INIZIO']=pd.to_datetime(analisi_uscite_updated['DATA_INIZIO'])
 analisi_uscite_updated['DATA_FINE']=pd.to_datetime(analisi_uscite_updated['DATA_FINE'])
 patologies=pd.read_csv('./Desktop/Progetto_biology/Primo_upload/Patologie.csv',';')
 
 
-# # global variables
-
 # In[4]:
 
 
-analysis_entries_updated=analysis_entries_updated.fillna(0)
+
 ID_Bologna=anag_comune_bo['ID_PER']
 database_entries=analysis_entries_updated[['SETTING','ID_PER','DECEDUTO']]
 database_entries_bo=pd.merge(ID_Bologna,database_entries, how='left', on=['ID_PER'])
@@ -42,8 +44,7 @@ dataset_setting=analysis_entries_updated[['SETTING','ID_PER']]
 dataset_patologies=patologies[['Descrizione_Esenzione','ID_PER']]
 database_entries_bo_covid=database_entries_bo[database_entries_bo.SETTING.isin(['TERAPIA INTENSIVA COVID','DEGENZA ORDINARIA COVID','SUB INTENSIVA COVID','DEGENZA COVID BASSA INTENSITA'])]
 sex_bolo=anag_comune_bo[['PER_KEY_SESSO','ID_PER']]
-positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZIONE'])
-positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
+
 
 
 # # Check on the database 'casi covid unibo' to make sure everything is matching in the database
@@ -54,16 +55,16 @@ positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
 
 #dataset matching
 
-still_sick=positivi_unibo.DATA_ESITO.isna().value_counts() #patients still not healthy
-still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts() #patients who still have covid
+still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients still not healthy
+still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts().loc[False] #patients who still have covid
 #check if this 2 groups are the same (they should be)
-if len(still_sick)=len(still_pos):
+if still_sick==still_pos:
+    iscovidnow=create_target_list(positivi_unibo,'MALATTIA IN CORSO')
+    
+ 
 
 
-iscovidnow=[]
-for i in range(0, len(positivi_unibo.index)):
-    if 'MALATTIA IN CORSO' in positivi_unibo.ESITO.iloc[i]:
-        iscovidnow.append(i)
+
 database_pos_outcome=positivi_unibo.drop(iscovidnow)
 database_pos_KM=positivi_unibo.drop(iscovidnow)
 database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)
