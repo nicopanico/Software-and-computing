@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
+sys.path.append('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
 ##importing packages used in the script
 import pandas as pd
 import numpy as np
@@ -11,26 +11,25 @@ import scipy.stats as st
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
-import my_functions
 import sys
 get_ipython().system('{sys.executable} -m pip install lifelines')
 
-
+import my_functions
 
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
-anag_comune_bo=pd.read_csv('./Desktop/Progetto_biology/Primo_upload/ANAGCOMUNEBO.csv')
-positivi_unibo=pd.read_csv('./Desktop/Progetto_biology/Casi_covid_unibo_2021-11-22.csv',';')
+anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')
+positivi_unibo=pd.read_csv('./Data_set/Casi_covid_unibo_2021-11-22.csv',';')
 positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZIONE'])
 positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
-analysis_entries_updated=pd.read_csv('./Desktop/Progetto_biology/Secondo_upload/ANALISI_ENTRATE_2021_10_13.csv',';')
+analysis_entries_updated=pd.read_csv('./Data_set/ANALISI_ENTRATE_2021_10_13.csv',';')
 analysis_entries_updated['DATA_INIZIO']=pd.to_datetime(analysis_entries_updated['DATA_INIZIO'])
 analysis_entries_updated=analysis_entries_updated.fillna(0)
-analisi_uscite_updated=pd.read_csv('./Desktop/Progetto_biology/Secondo_upload/ANALISI_USCITE_2021_10_13.csv',';')
+analisi_uscite_updated=pd.read_csv('./Data_set/ANALISI_USCITE_2021_10_13.csv',';')
 analisi_uscite_updated['DATA_INIZIO']=pd.to_datetime(analisi_uscite_updated['DATA_INIZIO'])
 analisi_uscite_updated['DATA_FINE']=pd.to_datetime(analisi_uscite_updated['DATA_FINE'])
-patologies=pd.read_csv('./Desktop/Progetto_biology/Primo_upload/Patologie.csv',';')
+patologies=pd.read_csv('./Data_set/Patologie.csv',';')
 
 
 # In[4]:
