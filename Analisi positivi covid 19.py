@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+import sys
 sys.path.append('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
 ##importing packages used in the script
 import pandas as pd
@@ -11,8 +11,8 @@ import scipy.stats as st
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
-import sys
-get_ipython().system('{sys.executable} -m pip install lifelines')
+
+# get_ipython().system('{sys.executable} -m pip install lifelines')
 
 import my_functions
 
@@ -58,26 +58,22 @@ still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients 
 still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts().loc[False] #patients who still have covid
 #check if this 2 groups are the same (they should be)
 if still_sick==still_pos:
-    iscovidnow=create_target_list(positivi_unibo,'MALATTIA IN CORSO')
-    
- 
+    iscovidnow=create_target_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
+    database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
+    database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)#and remove the duplciates ID
 
-
-
-database_pos_outcome=positivi_unibo.drop(iscovidnow)
-database_pos_KM=positivi_unibo.drop(iscovidnow)
-database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)
-
-#display(database_pos_outcome)
-ID_positives=database_pos_outcome['ID_PER']    
+#taking the IDs of positive patients
+ID_positives=database_pos_outcome['ID_PER']  
+"""
+Now merge the IDs of the positive patients with the people in covid hopsital settings
+to see how many positive patients got hospitalized
+"""  
 database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positives,how='inner',on=['ID_PER'])
-
+ 
+# database_pos_KM=positivi_unibo.drop(iscovidnow)
 
 # Checking the number of positives deceased and comparing it with the patients deceased in covid departments
-
-# In[8]:
-
-
+#create the database containing the ID of all the positives also the non-hospitalized ones
 database_pos_bolo=pd.merge(database_pos_outcome,ID_Bologna,how='inner',on=['ID_PER'])
 database_pos_bolo=database_pos_bolo.drop_duplicates(subset=['ID_PER'])
 
@@ -86,12 +82,15 @@ for i in range(0,len(database_pos_bolo.index)):
     if 'DECESSO' in database_pos_bolo.ESITO.iloc[i]:
         isposdeceased.append(i)
 print('number of positives deceased for bologna IDs:',len(isposdeceased))
+is_pos_deceased=create_target_list(database_pos_bolo,'DECESSO','ESITO')
+
+
 iscovdeceased=[]
 for i in range(0, len(database_entries_bo_covid.index)):
     if database_entries_bo_covid['DECEDUTO'].iloc[i]==1:
         iscovdeceased.append(i)
 print('number of deceased in covid settings:',len(iscovdeceased))
-
+is_cov_deceased=create_target_list(database_entries_bo_covid,'DECEDUTO')
 
 # Checking if the total number of hopistalized in covid departments are positves
 

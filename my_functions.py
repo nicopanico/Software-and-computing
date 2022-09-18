@@ -18,6 +18,8 @@ Created on Sat Sep 10 11:06:22 2022
 def create_target_list(df, key_word, col_name):
     target_list=[] #defining the list
     for i in range(0,len(df.index)):
-        if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
-            target_list.append(i)
+        if df[col_name].isnull().values.any():#check if the values in the columns are NaN in that case skit the iteration
+            continue
+        elif key_word in df[col_name].iloc[i]: #search if the key_word is in the column
+                 target_list.append(i)
     return(target_list) 
