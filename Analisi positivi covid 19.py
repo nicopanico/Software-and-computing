@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
-import sys
-sys.path.append('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
+import os
+os.chdir('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
+
 ##importing packages used in the script
 import pandas as pd
 import numpy as np
@@ -19,6 +20,9 @@ import my_functions
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
+
+
+
 anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')
 positivi_unibo=pd.read_csv('./Data_set/Casi_covid_unibo_2021-11-22.csv',';')
 positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZIONE'])
@@ -30,18 +34,17 @@ analisi_uscite_updated=pd.read_csv('./Data_set/ANALISI_USCITE_2021_10_13.csv',';
 analisi_uscite_updated['DATA_INIZIO']=pd.to_datetime(analisi_uscite_updated['DATA_INIZIO'])
 analisi_uscite_updated['DATA_FINE']=pd.to_datetime(analisi_uscite_updated['DATA_FINE'])
 patologies=pd.read_csv('./Data_set/Patologie.csv',';')
-
+ID_Bologna=anag_comune_bo['ID_PER']#all the ID of Bologna
 
 # In[4]:
 
 
 
-ID_Bologna=anag_comune_bo['ID_PER']
+
 database_entries=analysis_entries_updated[['SETTING','ID_PER','DECEDUTO']]
-database_entries_bo=pd.merge(ID_Bologna,database_entries, how='left', on=['ID_PER'])
-dataset_setting=analysis_entries_updated[['SETTING','ID_PER']]
-dataset_patologies=patologies[['Descrizione_Esenzione','ID_PER']]
-database_entries_bo_covid=database_entries_bo[database_entries_bo.SETTING.isin(['TERAPIA INTENSIVA COVID','DEGENZA ORDINARIA COVID','SUB INTENSIVA COVID','DEGENZA COVID BASSA INTENSITA'])]
+
+
+
 sex_bolo=anag_comune_bo[['PER_KEY_SESSO','ID_PER']]
 
 
@@ -58,7 +61,7 @@ still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients 
 still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts().loc[False] #patients who still have covid
 #check if this 2 groups are the same (they should be)
 if still_sick==still_pos:
-    iscovidnow=create_target_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
+    iscovidnow=create_target_ID_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
     database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
     database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)#and remove the duplciates ID
 
@@ -68,6 +71,14 @@ ID_positives=database_pos_outcome['ID_PER']
 Now merge the IDs of the positive patients with the people in covid hopsital settings
 to see how many positive patients got hospitalized
 """  
+database_entries_bo=pd.merge(ID_Bologna,analysis_entries_updated[['SETTING','ID_PER','DECEDUTO']], 
+                             how='left', on=['ID_PER'])
+#define the sub-dataset containing the entries for all the covid settings
+database_entries_bo_covid=database_entries_bo[database_entries_bo.SETTING.isin(['TERAPIA INTENSIVA COVID',
+                                                                                'DEGENZA ORDINARIA COVID',
+                                                                                'SUB INTENSIVA COVID',
+                                                                                'DEGENZA COVID BASSA INTENSITA'])]
+#database for all the patients that have covid and are in covid settings
 database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positives,how='inner',on=['ID_PER'])
  
 # database_pos_KM=positivi_unibo.drop(iscovidnow)
@@ -77,37 +88,20 @@ database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positi
 database_pos_bolo=pd.merge(database_pos_outcome,ID_Bologna,how='inner',on=['ID_PER'])
 database_pos_bolo=database_pos_bolo.drop_duplicates(subset=['ID_PER'])
 
-isposdeceased=[]
-for i in range(0,len(database_pos_bolo.index)):
-    if 'DECESSO' in database_pos_bolo.ESITO.iloc[i]:
-        isposdeceased.append(i)
+isPosDeceased=create_target_ID_list(database_pos_bolo,'DECESSO','ESITO')
 print('number of positives deceased for bologna IDs:',len(isposdeceased))
-is_pos_deceased=create_target_list(database_pos_bolo,'DECESSO','ESITO')
 
+isCovDeceased=deceased_list(database_entries_bo_covid)
 
-iscovdeceased=[]
-for i in range(0, len(database_entries_bo_covid.index)):
-    if database_entries_bo_covid['DECEDUTO'].iloc[i]==1:
-        iscovdeceased.append(i)
-print('number of deceased in covid settings:',len(iscovdeceased))
-is_cov_deceased=create_target_list(database_entries_bo_covid,'DECEDUTO')
 
 # Checking if the total number of hopistalized in covid departments are positves
-
-# In[9]:
-
-
 print('number of positive patients hospitalized in covid setting:', len(database_entries_bo_covid_positives.index),'\n',
       'total number of patients hospitalized in covid setting:',len(database_entries_bo_covid.index))
 
 
 # Getting the datasets of 'SETTING' and 'Descrizione_Esenzione' per ID
-
-# # Processing the datasets in order to proceed with the analysis
-
-# In[10]:
-
-
+dataset_setting=analysis_entries_updated[['SETTING','ID_PER']]
+dataset_patologies=patologies[['Descrizione_Esenzione','ID_PER']]
 dataset_patologies_per_setting=pd.merge(dataset_setting, dataset_patologies, how='left',on=['ID_PER'])
 
 #narrowing down the analysis to just Bologna ID_PER
@@ -133,15 +127,10 @@ dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positive
 # In[12]:
 
 
-isPosinCovidint=[]
-for i in range(0,len(dataset_tracking_bologna_positives.index)):
-    if 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i]:
-        isPosinCovidint.append(i)
-        
-isinCovidint=[]
-for i in range(0, len(dataset_tracking_bologna.index)):
-    if 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna['SETTING'].iloc[i]:
-        isinCovidint.append(i)
+isPosinCovidint=create_target_ID_list(dataset_tracking_bologna_positives,'TERAPIA INTENSIVA COVID',
+                                      'SETTING')     
+isinCovidint=create_target_ID_list(dataset_tracking_bologna,'TERAPIA INTENSIVA COVID','SETTING')
+
 print('Number of patients hospitalized in covid intensive care:',len(isinCovidint),'\n',
       'Number of positive patients hospitalized in covid intensive care',len(isPosinCovidint))
 
