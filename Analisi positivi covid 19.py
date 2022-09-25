@@ -36,8 +36,6 @@ analisi_uscite_updated['DATA_FINE']=pd.to_datetime(analisi_uscite_updated['DATA_
 patologies=pd.read_csv('./Data_set/Patologie.csv',';')
 ID_Bologna=anag_comune_bo['ID_PER']#all the ID of Bologna
 
-# In[4]:
-
 
 
 
@@ -61,7 +59,7 @@ still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients 
 still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts().loc[False] #patients who still have covid
 #check if this 2 groups are the same (they should be)
 if still_sick==still_pos:
-    iscovidnow=create_target_ID_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
+    iscovidnow=my_functions.create_target_ID_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
     database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
     database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)#and remove the duplciates ID
 
@@ -88,10 +86,10 @@ database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positi
 database_pos_bolo=pd.merge(database_pos_outcome,ID_Bologna,how='inner',on=['ID_PER'])
 database_pos_bolo=database_pos_bolo.drop_duplicates(subset=['ID_PER'])
 
-isPosDeceased=create_target_ID_list(database_pos_bolo,'DECESSO','ESITO')
-print('number of positives deceased for bologna IDs:',len(isposdeceased))
+isPosDeceased=my_functions.create_target_ID_list(database_pos_bolo,'DECESSO','ESITO')
+print('number of positives deceased for bologna IDs:',len(isPosDeceased))
 
-isCovDeceased=deceased_list(database_entries_bo_covid)
+isCovDeceased=my_functions.deceased_list(database_entries_bo_covid)
 
 
 # Checking if the total number of hopistalized in covid departments are positves
@@ -113,7 +111,7 @@ dataset_bolo_patologies=dataset_bolo_patologies.fillna('NaN')
 
 # Modelling the database to have the complete description of the setting and patology for each Bologna ID
 
-# In[11]:
+
 
 
 dataset_bolo_patologies=dataset_bolo_patologies.groupby(['ID_PER']).agg({'Descrizione_Esenzione':','.join})
@@ -124,12 +122,11 @@ dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positive
 
 # Checking if all the hospitalized patients in covid settings are positives
 
-# In[12]:
 
 
-isPosinCovidint=create_target_ID_list(dataset_tracking_bologna_positives,'TERAPIA INTENSIVA COVID',
+isPosinCovidint=my_functions.create_target_ID_list(dataset_tracking_bologna_positives,'TERAPIA INTENSIVA COVID',
                                       'SETTING')     
-isinCovidint=create_target_ID_list(dataset_tracking_bologna,'TERAPIA INTENSIVA COVID','SETTING')
+isinCovidint=my_functions.create_target_ID_list(dataset_tracking_bologna,'TERAPIA INTENSIVA COVID','SETTING')
 
 print('Number of patients hospitalized in covid intensive care:',len(isinCovidint),'\n',
       'Number of positive patients hospitalized in covid intensive care',len(isPosinCovidint))
@@ -161,7 +158,12 @@ list_setting_cov_noint=['DEGENZA ORDINARIA COVID'  ,'SUB INTENSIVA COVID', 'DEGE
 # First contingency: taking into account only patients from covid intensive care
 
 # In[14]:
-
+isbothsetting=[]
+for i in range(0,len(dataset_tracking_bologna_positives.index)):
+    if ('DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] and 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i]):
+        isbothsetting.append(i)                                                                                          
+    
+    
 
 isPosnotcovint=[]
 for i in range(0,len(dataset_tracking_bologna_positives.index)):

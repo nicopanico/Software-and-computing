@@ -10,15 +10,23 @@ import hypothesis
 from hypothesis import strategies as st
 from hypothesis import settings
 from hypothesis import given
+import pandera as pa
 
 
-def test_create_target_list(df,key_word,col_name):
+schema = pa.DataFrameSchema({
+    
+    "column1": pa.Column(str
+    ),
+})
+@given(schema.strategy(size=5))
+def test_create_target_ID_list(schema,key_word,col_name):
 
-    test_list=create_target_list(df, key_word, col_name)
+    test_list=create_target_list(schema, key_word, col_name)
+    assert len(test_list)==len(schema.columns), f"expected the same number"
     
+
     
-    
-    
+
     
     
     
