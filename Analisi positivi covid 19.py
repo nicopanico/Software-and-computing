@@ -12,15 +12,14 @@ import scipy.stats as st
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
-
 # get_ipython().system('{sys.executable} -m pip install lifelines')
-
 import my_functions
-
+import names
+import settings
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
-
-
+class_names.names.inizio
+settings.settings.sub_intensiva_covid
 
 
 anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')
@@ -95,7 +94,7 @@ isCovDeceased=my_functions.deceased_list(database_entries_bo_covid)
 # Checking if the total number of hopistalized in covid departments are positves
 print('number of positive patients hospitalized in covid setting:', len(database_entries_bo_covid_positives.index),'\n',
       'total number of patients hospitalized in covid setting:',len(database_entries_bo_covid.index))
-
+database_pos_KM
 
 # Getting the datasets of 'SETTING' and 'Descrizione_Esenzione' per ID
 dataset_setting=analysis_entries_updated[['SETTING','ID_PER']]

@@ -24,14 +24,13 @@ from scipy.stats import fisher_exact
   col_name=name of the column where we would like to search key_word given as a string
   
     '''
-def create_target_ID_list(df, key_list, col_name):
+def create_target_ID_list(df, key_word, col_name):
    if col_name  not in df.columns:#check if the column is in the dataframe otherwise arise an error and break the cycle
        raise ValueError('{} is not in the dataframe columns'.format(col_name))
    else:
        target_list=[] #defining the list
-       for i in range(0,len(df.index)):   
-             for k in range(0,len(key_list)-1):
-                 if key_list[k] in df[col_name].iloc[i]: #search if the key_word is in the column
+       for i in range(0,len(df.index)):              
+           if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
                        target_list.append(i)
        return(target_list) 
    
@@ -44,6 +43,11 @@ def deceased_list(df):
            if df['DECEDUTO'].iloc[i]==1:
                 deceased_list.append(i)
        return(deceased_list)
+   
+#non hard coddare le stringhe nel codice ma metterle ij una classe
+#as dataclass @dataclass(frozen)
+#deceduto="deceduto" e la chaimo ogni volta
+#logging package da vedere!!
 
 
 
