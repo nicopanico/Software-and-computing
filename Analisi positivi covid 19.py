@@ -4,6 +4,8 @@ import os
 os.chdir('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
 
 ##importing packages used in the script
+
+from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,6 +18,7 @@ from scipy.stats import fisher_exact
 import my_functions
 import names
 import settings
+
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 class_names.names.inizio

@@ -32,6 +32,9 @@ def create_target_ID_list(df, key_word, col_name):
        for i in range(0,len(df.index)):              
            if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
                        target_list.append(i)
+           else:
+               continue
+                          
        return(target_list) 
    
 def deceased_list(df):
