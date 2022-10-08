@@ -23,7 +23,7 @@ from scipy.stats import fisher_exact
   key_word= word we would like to search in our dataset given as a string
   col_name=name of the column where we would like to search key_word given as a string
   
-    '''
+  '''
 def create_target_ID_list(df, key_word, col_name):
    if col_name  not in df.columns:#check if the column is in the dataframe otherwise arise an error and break the cycle
        raise ValueError('{} is not in the dataframe columns'.format(col_name))
@@ -47,9 +47,7 @@ def deceased_list(df):
                 deceased_list.append(i)
        return(deceased_list)
    
-#non hard coddare le stringhe nel codice ma metterle ij una classe
-#as dataclass @dataclass(frozen)
-#deceduto="deceduto" e la chaimo ogni volta
+
 #logging package da vedere!!
 
 

@@ -12,16 +12,16 @@ Dataclass to define all the names used for the dataset columns
 """
 @dataclass(frozen=True)
 class names:
-    inizio="DATA INIZIO"
-    fine="DATA FINE"
-    esito="DATA ESITO"
-    accettazione="DATA ACCETTAZIONE"
-    ID="ID PER"
+    inizio="DATA_INIZIO"
+    fine="DATA_FINE"
+    esito="DATA_ESITO"
+    accettazione="DATA_ACCETTAZIONE"
+    ID="ID_PER"
     setting="SETTING"
     deceduto="DECEDUTO"
-    sesso="PER KEY SESSO"
-    malattia="MALATTIA IN CORSO"
-    esito="ESITO"
+    sesso="PER_KEY_SESSO"
+    malattia="MALATTIA_IN_CORSO"
+    esito2="ESITO"
     descrizione_esenzione="Descrizione esenzione"
     
     

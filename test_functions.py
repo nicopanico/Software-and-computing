@@ -41,11 +41,34 @@ def test_create_target_ID_list(df=df,key_word=sett_hosp.hospital.intensiva_covid
     assert len(test_list)==df[col_name].value_counts()[key_word], f"expected the same number"
     
 
-    
+   
+df=data_frames(columns=columns(["DECEDUTO"],dtype=str),
+                        rows=st.tuples(
+                             st.integers(0,1))).example()
+def test_deceased_list(df=df):
+    """
+    Test that given a dataset containing a deceased column the fucntion appends in the colums only the rows that have
+    1 as value for deceased
+    As input:
+        Dataframe with a deceased column
+    As output:
+        list containing the row numbers of the deceased patients
+    """
 
-    
-    
-    
+    Parameters
+    ----------
+    df : TYPE, optional
+        DESCRIPTION. The default is df.
+
+    Returns
+    -------
+    None.
+
+    """
+     isdead=my_functions.deceased_list(df)
+     assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), f"expected the same number"
+     
+                                
     
     
     

@@ -17,35 +17,33 @@ from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions
 import names
-import settings
+import sett_hosp
 
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
-class_names.names.inizio
-settings.settings.sub_intensiva_covid
 
 
 anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')
 positivi_unibo=pd.read_csv('./Data_set/Casi_covid_unibo_2021-11-22.csv',';')
-positivi_unibo['DATA_ACCETTAZIONE']=pd.to_datetime(positivi_unibo['DATA_ACCETTAZIONE'])
-positivi_unibo['DATA_ESITO']=pd.to_datetime(positivi_unibo['DATA_ESITO'])
+positivi_unibo[names.names.accettazione]=pd.to_datetime(positivi_unibo[names.names.accettazione])
+positivi_unibo[names.names.esito]=pd.to_datetime(positivi_unibo[names.names.esito])
 analysis_entries_updated=pd.read_csv('./Data_set/ANALISI_ENTRATE_2021_10_13.csv',';')
-analysis_entries_updated['DATA_INIZIO']=pd.to_datetime(analysis_entries_updated['DATA_INIZIO'])
+analysis_entries_updated[names.names.inizio]=pd.to_datetime(analysis_entries_updated[names.names.inizio])
 analysis_entries_updated=analysis_entries_updated.fillna(0)
 analisi_uscite_updated=pd.read_csv('./Data_set/ANALISI_USCITE_2021_10_13.csv',';')
-analisi_uscite_updated['DATA_INIZIO']=pd.to_datetime(analisi_uscite_updated['DATA_INIZIO'])
-analisi_uscite_updated['DATA_FINE']=pd.to_datetime(analisi_uscite_updated['DATA_FINE'])
+analisi_uscite_updated[names.names.inizio]=pd.to_datetime(analisi_uscite_updated[names.names.inizio])
+analisi_uscite_updated[names.names.fine]=pd.to_datetime(analisi_uscite_updated[names.names.fine])
 patologies=pd.read_csv('./Data_set/Patologie.csv',';')
-ID_Bologna=anag_comune_bo['ID_PER']#all the ID of Bologna
+ID_Bologna=anag_comune_bo[names.names.ID]#all the ID of Bologna
 
 
 
 
-database_entries=analysis_entries_updated[['SETTING','ID_PER','DECEDUTO']]
+database_entries=analysis_entries_updated[[names.names.setting,names.names.ID,names.names.deceduto]]
 
 
 
-sex_bolo=anag_comune_bo[['PER_KEY_SESSO','ID_PER']]
+sex_bolo=anag_comune_bo[[names.names.sesso,names.names.ID]]
 
 
 
@@ -58,15 +56,15 @@ sex_bolo=anag_comune_bo[['PER_KEY_SESSO','ID_PER']]
 #dataset matching
 
 still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients still not healthy
-still_pos=positivi_unibo.ESITO.isin(['MALATTIA IN CORSO']).value_counts().loc[False] #patients who still have covid
+still_pos=positivi_unibo.ESITO.isin([names.names.malattia]).value_counts().loc[False] #patients who still have covid
 #check if this 2 groups are the same (they should be)
 if still_sick==still_pos:
-    iscovidnow=my_functions.create_target_ID_list(positivi_unibo,'MALATTIA IN CORSO','ESITO')
+    iscovidnow=my_functions.create_target_ID_list(positivi_unibo,names.names.malattia,names.names.esito2)
     database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
-    database_pos_outcome.drop_duplicates(subset=['ID_PER'], inplace=True)#and remove the duplciates ID
+    database_pos_outcome.drop_duplicates(subset=[names.names.ID], inplace=True)#and remove the duplciates ID
 
 #taking the IDs of positive patients
-ID_positives=database_pos_outcome['ID_PER']  
+ID_positives=database_pos_outcome[names.names.ID]  
 """
 Now merge the IDs of the positive patients with the people in covid hopsital settings
 to see how many positive patients got hospitalized
