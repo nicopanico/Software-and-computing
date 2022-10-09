@@ -21,8 +21,12 @@ class names:
     deceduto="DECEDUTO"
     sesso="PER_KEY_SESSO"
     malattia="MALATTIA_IN_CORSO"
-    esito2="ESITO"
-    descrizione_esenzione="Descrizione esenzione"
+    descrizione_esenzione="Descrizione_Esenzione"
+
+@dataclass(frozen=True)
+class keywords:
+    decesso='DECESSO'
+    esito="ESITO"
     
     
     
