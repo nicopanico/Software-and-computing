@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
-import os
+import sys,os
 os.chdir('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
-
+sys.path.append(os.path.dirname(os.path.realpath(file)))
 ##importing packages used in the script
 
 from dataclasses import dataclass
