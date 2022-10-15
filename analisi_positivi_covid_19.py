@@ -2,7 +2,8 @@
 # coding: utf-8
 import sys,os
 os.chdir('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
-sys.path.append(os.path.dirname(os.path.realpath(file)))
+sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
+
 ##importing packages used in the script
 
 from dataclasses import dataclass
@@ -58,7 +59,7 @@ sex_bolo=anag_comune_bo[[names.names.sesso,names.names.ID]]
 still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients still not healthy
 still_pos=positivi_unibo.ESITO.isin([names.names.malattia]).value_counts().loc[False] #patients who still have covid
 
-iscovidnow=my_functions.create_target_ID_list(positivi_unibo,names.names.malattia,names.names.esito2)
+iscovidnow=my_functions.create_target_ID_list(positivi_unibo,names.names.malattia,names.keywords.esito)
 database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
 database_pos_outcome.drop_duplicates(subset=[names.names.ID], inplace=True)#and remove the duplciates ID
 

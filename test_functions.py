@@ -54,19 +54,8 @@ def test_deceased_list(df=df):
     As output:
         list containing the row numbers of the deceased patients
     """
-
-    Parameters
-    ----------
-    df : TYPE, optional
-        DESCRIPTION. The default is df.
-
-    Returns
-    -------
-    None.
-
-    """
-     isdead=my_functions.deceased_list(df)
-     assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), f"expected the same number"
+    isdead=my_functions.deceased_list(df)
+    assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), f"expected the same number"
      
                                 
     
