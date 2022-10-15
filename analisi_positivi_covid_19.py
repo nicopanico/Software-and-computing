@@ -17,21 +17,21 @@ from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions
-import Classes_for_user
+from Classes_for_user import names,sett_hosp
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
 
 anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')
 positivi_unibo=pd.read_csv('./Data_set/Casi_covid_unibo_2021-11-22.csv',';')
-positivi_unibo[names.accettazione]=pd.to_datetime(positivi_unibo[names.names.accettazione])
+positivi_unibo[names.names.accettazione]=pd.to_datetime(positivi_unibo[names.names.accettazione])
 positivi_unibo[names.names.esito]=pd.to_datetime(positivi_unibo[names.names.esito])
 analysis_entries_updated=pd.read_csv('./Data_set/ANALISI_ENTRATE_2021_10_13.csv',';')
 analysis_entries_updated[names.names.inizio]=pd.to_datetime(analysis_entries_updated[names.names.inizio])
 analysis_entries_updated=analysis_entries_updated.fillna(0)
 analisi_uscite_updated=pd.read_csv('./Data_set/ANALISI_USCITE_2021_10_13.csv',';')
 analisi_uscite_updated[names.names.inizio]=pd.to_datetime(analisi_uscite_updated[names.names.inizio])
-analisi_uscite_updated[names.fine]=pd.to_datetime(analisi_uscite_updated[names.names.fine])
+analisi_uscite_updated[names.names.fine]=pd.to_datetime(analisi_uscite_updated[names.names.fine])
 patologies=pd.read_csv('./Data_set/Patologie.csv',';')
 ID_Bologna=anag_comune_bo[names.names.ID]#all the ID of Bologna
 
@@ -132,8 +132,11 @@ print('Number of patients hospitalized in covid intensive care:',len(isinCovidin
 
 
 # # Contingency tables of positive Bologna IDs
-
-# In[13]:
+"""
+Create contingency tables in order to see if there is some correlation between the covid intensive care hospitalized and 
+the patologies:
+    the list of patologies to test was given a priori, out of all the patologie sin the dataset only 6 were chosen 
+"""
 
 
 trial_list=['DIABETE MELLITO-DIABETE MELLITO','IPERTENSIONE ESSENZIALE',

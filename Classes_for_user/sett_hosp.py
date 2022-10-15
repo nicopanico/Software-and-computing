@@ -6,6 +6,8 @@ Created on Sat Oct  1 17:25:31 2022
 """
 
 from dataclasses import dataclass
+
+
 """
 Dataclass defining all the setting(hospital departments) in the datasets, for the patients
 dividing them between covid and non-covid
