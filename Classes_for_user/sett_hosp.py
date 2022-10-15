@@ -32,7 +32,22 @@ class hospital:
     sub_intensiva_covid="SUB INTENSIVA COVID"
     degenza_covid_bassa_intesita="DEGENZA COVID BASSA INTENSITA"
     intensiva_covid="TERAPIA INTENSIVA COVID"
-    
+  
+@dataclass(frozen=True)
+class SettingList:
+    nocovid_setting=['DEGENZA MED GENERALE NO COVID',          
+'DEGENZA CHIR SPECIALISTICA NO COVID',   
+'DEGENZA MED SPECIALISTICA NO COVID',     
+'ALTRO',                                 
+
+'DEGENZA CHIR GENERALE NO COVID',         
+'TERAPIA INTENSIVA NO COVID',            
+'SUB INTENSIVA NO COVID',                
+'EMERGENZA-URGENZA',                     
+'SOSPETTI COVID',                          
+'ORTOPEDIA']
+    covid_setting=['DEGENZA ORDINARIA COVID'  ,'SUB INTENSIVA COVID', 'DEGENZA COVID BASSA INTENSITA',
+                   'TERAPIA INTENSIVA COVID']
     
     
     
