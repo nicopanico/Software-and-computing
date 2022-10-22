@@ -17,7 +17,7 @@ from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions as ff
-from Classes_for_user import names,sett_hosp
+from Classes_for_user import names,sett_hosp,patology
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
@@ -57,7 +57,7 @@ sex_bolo=anag_comune_bo[[names.names.sesso,names.names.ID]]
 still_sick=positivi_unibo.DATA_ESITO.isna().value_counts().loc[False] #patients still not healthy
 still_pos=positivi_unibo.ESITO.isin([names.names.malattia]).value_counts().loc[False] #patients who still have covid
 
-iscovidnow=my_functions.create_target_ID_list(positivi_unibo,names.names.malattia,names.keywords.esito)
+iscovidnow=ff.create_target_ID_list(positivi_unibo,names.names.malattia,names.keywords.esito)
 database_pos_outcome=positivi_unibo.drop(iscovidnow)#drop patients who still have covid
 database_pos_outcome.drop_duplicates(subset=[names.names.ID], inplace=True)#and remove the duplciates ID
 
@@ -85,10 +85,10 @@ database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positi
 database_pos_bolo=pd.merge(database_pos_outcome,ID_Bologna,how='inner',on=[names.names.ID])
 database_pos_bolo=database_pos_bolo.drop_duplicates(subset=[names.names.ID])
 
-isPosDeceased=my_functions.create_target_ID_list(database_pos_bolo,names.keywords.decesso,names.keywords.esito)
+isPosDeceased=ff.create_target_ID_list(database_pos_bolo,names.keywords.decesso,names.keywords.esito)
 print('number of positives deceased for bologna IDs:',len(isPosDeceased))
 
-isCovDeceased=my_functions.deceased_list(database_entries_bo_covid)
+isCovDeceased=ff.deceased_list(database_entries_bo_covid)
 
 
 # Checking if the total number of hopistalized in covid departments are positves
@@ -123,9 +123,9 @@ dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positive
 
 
 
-isPosinCovidint=my_functions.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.intensiva_covid,
+isPosinCovidint=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.intensiva_covid,
                                       names.names.setting)     
-isinCovidint=my_functions.create_target_ID_list(dataset_tracking_bologna,sett_hosp.hospital.intensiva_covid,names.names.setting)
+isinCovidint=ff.create_target_ID_list(dataset_tracking_bologna,sett_hosp.hospital.intensiva_covid,names.names.setting)
 
 print('Number of patients hospitalized in covid intensive care:',len(isinCovidint),'\n',
       'Number of positive patients hospitalized in covid intensive care',len(isPosinCovidint))
@@ -138,11 +138,8 @@ the patologies:
     the list of patologies to test was given a priori, out of all the patologie sin the dataset only 6 were chosen 
 """
 
+trial_list=patology.patologies.patlist
 
-trial_list=['DIABETE MELLITO-DIABETE MELLITO','IPERTENSIONE ESSENZIALE',
-            'EMBOLIA E TROMBOSI DI ALTRE VENE (ESCLUSO SINDROME DI BUDD-CHIARI)',
-          'SOGGETTI AFFETTI DA PATOLOGIE NEOPLASTICHE MALIGNE - SOGGETTI AFFETTI DA PATOLOGIE NEOPLASTICHE MALIGNE',
-           'ARITMIE CARDIACHE','CARDIOPATIA IPERTENSIVA']
 list_setting_nocov=sett_hosp.SettingList.nocovid_setting #list from the dataclass to take the list of
 #all the non covid settings
 list_setting_cov_noint=(sett_hosp.SettingList.covid_setting)
@@ -151,20 +148,14 @@ list_setting_cov_noint.remove(sett_hosp.hospital.intensiva_covid)
 
 # First contingency: taking into account only patients from covid intensive care
 
-# In[14]:
-isbothsetting=[]
-for i in range(0,len(dataset_tracking_bologna_positives.index)):
-    if ('DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] and 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i]):
-        isbothsetting.append(i)                                                                                          
+# In[14]:  
+isPosnotcovint=[]                                                                                 
+for i in range(0, len(list_setting_cov_noint)):
+    list_pat=ff.create_target_ID_list(dataset_tracking_bologna_positives,list_setting_cov_noint[i],names.names.setting)
+    isPosnotcovint=list(set().union(list_pat,isPosnotcovint))
+
     
-list1=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.degenza_covid_bassa_intesita,names.names.setting)
-list2=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.degenza_ordinaria_covid,names.names.setting)
-list3=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.sub_intensiva_covid,names.names.setting)
-list4=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.sub_intensiva_covid,names.names.setting)
-isPosnotcovint=list(set().union(list1,
-                                list2,
-                                list3,
-                                list4))
+
 
 for i in range(0,len(dataset_tracking_bologna_positives.index)):
     if ('DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA COVID BASSA INTENSITA' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'SUB INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i]) and 'TERAPIA INTENSIVA COVID' not in dataset_tracking_bologna_positives['SETTING'].iloc[i]:
