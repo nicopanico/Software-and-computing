@@ -13,7 +13,7 @@ from hypothesis import given
 from hypothesis.extra.pandas import data_frames, columns, column
 import pandera as pa
 import names
-import sett_hosp
+from Classes_for_user import names,sett_hosp,patology
 
 
 
@@ -57,7 +57,14 @@ def test_deceased_list(df=df):
     isdead=my_functions.deceased_list(df)
     assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), f"expected the same number"
      
-                                
+
+
+def test_common_elements(list1,list2):
+    """
+    test if the fucntion is correcting removing common elements of the 2 lists from list1
+    """   
+    
+                        
     
     
     

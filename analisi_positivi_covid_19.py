@@ -119,18 +119,6 @@ dataset_tracking_bologna=pd.merge(dataset_bolo_patologies,dataset_bolo_setting, 
 dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positives, how='inner', on=[names.names.ID])
 
 
-# Checking if all the hospitalized patients in covid settings are positives
-
-
-
-isPosinCovidint=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.intensiva_covid,
-                                      names.names.setting)     
-isinCovidint=ff.create_target_ID_list(dataset_tracking_bologna,sett_hosp.hospital.intensiva_covid,names.names.setting)
-
-print('Number of patients hospitalized in covid intensive care:',len(isinCovidint),'\n',
-      'Number of positive patients hospitalized in covid intensive care',len(isPosinCovidint))
-
-
 # # Contingency tables of positive Bologna IDs
 """
 Create contingency tables in order to see if there is some correlation between the covid intensive care hospitalized and 
@@ -147,52 +135,49 @@ list_setting_cov_noint.remove(sett_hosp.hospital.intensiva_covid)
 
 
 # First contingency: taking into account only patients from covid intensive care
-
-# In[14]:  
+  
 isPosnotcovint=[]                                                                                 
 for i in range(0, len(list_setting_cov_noint)):
     list_pat=ff.create_target_ID_list(dataset_tracking_bologna_positives,list_setting_cov_noint[i],names.names.setting)
     isPosnotcovint=list(set().union(list_pat,isPosnotcovint))
 
-    
+isPosInt=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.intensiva_covid,names.names.setting,)  
 
+#now remove the patients that have been hospitalized also in covid intensive care setting
+isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
 
-for i in range(0,len(dataset_tracking_bologna_positives.index)):
-    if ('DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA COVID BASSA INTENSITA' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'SUB INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i]) and 'TERAPIA INTENSIVA COVID' not in dataset_tracking_bologna_positives['SETTING'].iloc[i]:
-        isPosnotcovint.append(i)
+#also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
 dataset_pos_bolo_cov_int=dataset_tracking_bologna_positives.drop(isPosnotcovint)
 
-l=[]
-for i in range(0,len(dataset_pos_bolo_cov_int.index)):
-    if 'TERAPIA INTENSIVA COVID' in dataset_pos_bolo_cov_int['SETTING'].iloc[i]:
-        l.append(i)
-print(len(l))
+
 
 
 # Second contingency: taking into account only patients not from covid intensive care
 
-# In[15]:
+isPosinCovidint=ff.create_target_ID_list(dataset_tracking_bologna_positives,sett_hosp.hospital.intensiva_covid,
+                                      names.names.setting)     
+isinCovidint=ff.create_target_ID_list(dataset_tracking_bologna,sett_hosp.hospital.intensiva_covid,names.names.setting)
 
-
+#dataset excluding patients who passed throught the covid intensive care setting
 dataset_pos_bolo_no_cov_int=dataset_tracking_bologna_positives.drop(isPosinCovidint)
 
 
 # Third contingency: taking into account only patients coming from noncovid settings
 
 # In[16]:
-
-
 isPoscov=[]
-for i in range(0, len(dataset_tracking_bologna_positives.index)):
-    if 'TERAPIA INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'SUB INTENSIVA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA ORDINARIA COVID' in dataset_tracking_bologna_positives['SETTING'].iloc[i] or 'DEGENZA COVID BASSA INTENSITA' in dataset_tracking_bologna_positives['SETTING'].iloc[i]:
-        isPoscov.append(i)
+list_cov_setting=sett_hosp.SettingList.covid_setting
+for i in range(0, len(list_cov_setting)):
+    sett_list=ff.create_target_ID_list(dataset_tracking_bologna_positives,list_cov_setting[i],names.names.setting)
+    isPoscov=list(set().union(sett_list,isPoscov))
+    
 dataset_pos_bolo_no_cov=dataset_tracking_bologna_positives.drop(isPoscov)
-#all patients with are not in covid settings
+#exclude all the patients from covid settings
+
+    
+
 
 # FIRST contingency
-
-# In[17]:
-
 
 ispat=[]
 isint=[]
