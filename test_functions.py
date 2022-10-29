@@ -50,10 +50,11 @@ def test_create_target_ID_list(df,key_word,col_name):
         assert len(test_list)==0, "Empty dataframe should get list with no values"
     #chech on the keyword, if it is tha falsy value " " it gives you an empty list
     elif not key_word:
-        assert len(test_list)==0, "expected to be 0"
+        assert len(test_list)==0, "len of the list expected to be 0 for " ""
     #normal assertion
-    else:
+    elif key_word in set(df[names.names.setting]):
         assert len(test_list)==df[col_name].value_counts()[key_word], "expected the same number "
+    
 
    
 @given(df=data_frames(columns=columns(["DECEDUTO"],dtype=str),
@@ -90,7 +91,38 @@ def test_common_elements(list1,list2):
     assert any(x in set2  for x in outputList)==False, "expected the output list and the list2 to not share elements"
     
         
-                        
+"""
+TESTS for the contingency tables functions
+"""
+@given(df=data_frames(columns=columns(["SETTING","Descrizione_Esenzione"],dtype=str),
+                         rows=st.tuples(
+                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)",fullmatch=True),
+                             st.from_regex("(DIABETE MELLITO|IPERTENSIONE)",fullmatch=True))),key_word=st.from_regex("TERAPIA INTENSIVA COVID",fullmatch=True),ptlg=st.from_regex("IPERTENSIONE", fullmatch=True))    
+@settings(max_examples = 5)
+
+def test_create_contingency_single(df,ptlg,key_word):
+"""
+Test that, given a certain dataset with settings and patologies the fucntion is correcting creating the 2 lists with 'SI'
+and 'NO' for the contingency tables
+Inputs:
+    df== dataframe containing setting and patologies columns
+    ptlg== one random patology to test
+    key_word== setting to test the function
+Notes:
+    providing empty df gives a message from the function itself
+"""
+    if not df.empty:
+        ispat,isint=ff.create_contingency_single(df,ptlg,key_word)
+        #normal assert on the setting
+        assert isint.count('SI')==df[names.names.setting].value_counts()[key_word]
+        #asserts on the patient patology list
+        if ptlg in set(df[names.names.descrizione_esenzione]):
+            assert ispat.count('SI')==df[names.names.descrizione_esenzione].value_counts()[ptlg]
+        else:
+            assert ispat.count('SI')==0
+        
+       
+                      
     
     
     

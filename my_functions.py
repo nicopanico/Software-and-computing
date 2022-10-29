@@ -80,7 +80,72 @@ def common_elements(list1, list2):
             list1.remove(i)
     return(list1)
             
+
+
+def create_contingency_single(df,ptlg,key_word):
+    """
+    Function in order to get the lists of each to build a contingency table for a single key_word
+    Input:
+        df==dataframe to give as input to build the lists
+        ptlg==name of the patology to build the contingency lists
+        key_word==setting to take as reference to check the patology
+    Output:
+        ispat==list containing 'SI' for the aptient who have the patology 'NO' otherwise
+        isin==list containing 'SI' for the patients who are in the key_word setting 'NO' otherwise
+    @Nicola2022
+    """
+    if df.empty:
+        print("Can't get any List with an empty df")
+        return
+    else:
+ 
+       ispat=[]
+       isint=[]
    
+       for i in range(0, len(df.index)):
+            if ptlg in df[names.names.descrizione_esenzione].iloc[i]:
+                ispat.append('SI')
+            else:
+              ispat.append('NO')
+            if key_word in df[names.names.setting].iloc[i]:
+               isint.append('SI')
+            else:
+              isint.append('NO')
+       
+       return(ispat,isint)
+
+
+def create_contingency_multiple(df,ptlg,key_list):
+    """
+    Function in order to get the lists of each to build a contingency table for a single key_word
+    Input:
+        df==dataframe to give as input to build the lists
+        ptlg==name of the patology to build the contingency lists
+        key_list==settings to take as reference to check the patology (given as a list of strings saying all the setting where you would like to search the ptlg)
+    Output:
+        ispat==list containing 'SI' for the aptient who have the patology 'NO' otherwise
+        isin==list containing 'SI' for the patients who are in the key_list settings 'NO' otherwise
+    @Nicola2022
+    """
+    if df.empty:
+        print("Can't get any List with an empty df")
+        return
+    else:
+      ispat=[]
+      isint=[]
+      for i in range(0, len(df)):
+                if ptlg in df[names.names.descrizione_esenzione].iloc[i]:
+                    ispat.append('SI')
+                else:
+                    ispat.append('NO')
+                found=False
+                for k in key_list:
+                    if k in df[names.names.setting].iloc[i] and not found:
+                        isint.append('SI')
+                        found=True
+                if not found:
+                    isint.append('NO')
+      return(ispat,isint)
 
 
 
