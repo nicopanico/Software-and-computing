@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import scipy.stats as st
+import scipy.stats as stat
 import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
@@ -28,17 +28,20 @@ def create_target_ID_list(df, key_word, col_name):
     @Nicola-2022
   
   '''
-    if col_name  not in df.columns:
-        raise ValueError('{} is not in the dataframe columns'.format(col_name))
+    if df.empty:
+        target_list=[]
     else:
-       target_list=[] #defining the list
-       for i in range(0,len(df.index)):              
-           if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
+       if col_name  not in df.columns:
+           raise ValueError('{} is not in the dataframe columns'.format(col_name))
+       else:
+         target_list=[] #defining the list
+         for i in range(0,len(df.index)):              
+            if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
                        target_list.append(i)
-           else:
-               continue
+            else:
+                continue
                           
-       return(target_list) 
+    return(target_list) 
   
    
 def deceased_list(df):

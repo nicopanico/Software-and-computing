@@ -39,11 +39,21 @@ def test_create_target_ID_list(df,key_word,col_name):
     Notes:
         if you provide a columns_name non existent you will get an error message from the function itself as default
         nothing happens if you search for a key_word that does not exist in the column_name.....your list will be len==0
+    @Nicola2022
     """
     
-    test_list=ff.create_target_ID_list(df, key_word, col_name)
-    assert len(test_list)==df[col_name].value_counts()[key_word], f"expected the same number"
     
+    test_list=ff.create_target_ID_list(df, key_word, col_name)
+    
+    #first check on the empty dataframe to see if it gets an empty list
+    if df.empty:
+        assert len(test_list)==0, "Empty dataframe should get list with no values"
+    #chech on the keyword, if it is tha falsy value " " it gives you an empty list
+    elif not key_word:
+        assert len(test_list)==0, "expected to be 0"
+    #normal assertion
+    else:
+        assert len(test_list)==df[col_name].value_counts()[key_word], "expected the same number "
 
    
 @given(df=data_frames(columns=columns(["DECEDUTO"],dtype=str),
@@ -58,9 +68,10 @@ def test_deceased_list(df):
         Dataframe with a deceased column
     As output:
         list containing the row numbers of the deceased patients
+    @Nicola2022
     """
     isdead=ff.deceased_list(df)
-    assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), f"expected the same number"
+    assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), "expected the same number"
 
 
      
@@ -76,7 +87,7 @@ def test_common_elements(list1,list2):
     #assert that the final list has elements from list1 that are not in list 2
     #First convert lists into set
     set2=set(list2)
-    assert any(x in set2  for x in outputList)==False, f"expected the output list and the list2 to not share elements"
+    assert any(x in set2  for x in outputList)==False, "expected the output list and the list2 to not share elements"
     
         
                         
