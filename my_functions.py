@@ -4,7 +4,7 @@ Created on Sat Sep 10 11:06:22 2022
 
 @author: nicop
 """
-import warnings
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -84,7 +84,7 @@ def common_elements(list1, list2):
 
 def create_contingency_single(df,ptlg,key_word):
     """
-    Function in order to get the lists of each to build a contingency table for a single key_word
+    Function in order to get the lists to build a contingency table for a single key_word
     Input:
         df==dataframe to give as input to build the lists
         ptlg==name of the patology to build the contingency lists
@@ -117,7 +117,7 @@ def create_contingency_single(df,ptlg,key_word):
 
 def create_contingency_multiple(df,ptlg,key_list):
     """
-    Function in order to get the lists of each to build a contingency table for a single key_word
+    Function in order to get the lists  to build a contingency table for a key_list
     Input:
         df==dataframe to give as input to build the lists
         ptlg==name of the patology to build the contingency lists

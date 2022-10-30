@@ -83,6 +83,7 @@ list2=st.lists(st.integers()))
 def test_common_elements(list1,list2):
     """
     test if the fucntion is correcting removing common elements of the 2 lists from list1
+    @Nicola2022
     """   
     outputList=ff.common_elements(list1, list2)
     #assert that the final list has elements from list1 that are not in list 2
@@ -110,6 +111,7 @@ Inputs:
     key_word== setting to test the function
 Notes:
     providing empty df gives a message from the function itself
+@Nicola2022
 """
     if not df.empty:
         ispat,isint=ff.create_contingency_single(df,ptlg,key_word)
@@ -122,7 +124,18 @@ Notes:
             assert ispat.count('SI')==0
         
        
-                      
+ 
+    
+@given(df=data_frames(columns=columns(["SETTING","Descrizione_Esenzione"],dtype=str),
+                         rows=st.tuples(
+                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)",fullmatch=True),
+                             st.from_regex("(DIABETE MELLITO|IPERTENSIONE)",fullmatch=True))),key_word=st.from_regex("TERAPIA INTENSIVA COVID",fullmatch=True),ptlg=st.from_regex("IPERTENSIONE", fullmatch=True))    
+@settings(max_examples = 5)
+def test_create_contingency_multiple(df,ptlg,key_list)       
+"""
+
+
+"""              
     
     
     
