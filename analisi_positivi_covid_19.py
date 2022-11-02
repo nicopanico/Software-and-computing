@@ -18,9 +18,8 @@ from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions as ff
-from Classes_for_user import names,sett_hosp,patology
-
-
+from Classes_for_user import names,sett_hosp,patology,init_data
+import Classes_for_user.names.names as names
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
@@ -222,30 +221,32 @@ Keplan-Meier analysis on the patients in covid intensive care
 
 # Processing of the data
 database_pos_KM=positivi_unibo.drop(iscovidnow) #remove patients with on going covid using list created at line 63
-dataset_bolo_exit=pd.merge(ID_Bologna,analisi_uscite_updated,how='inner',on=[names.names.ID])
-dataset_bolo_exit_pos=pd.merge(ID_positives,dataset_bolo_exit,how='inner', on=[names.names.ID])
-test_2=pd.merge(dataset_bolo_exit_pos,analysis_entries_updated,how='inner',on=[names.names.ID,names.names.setting,names.names.id_ricovero,'DATA_INIZIO'])
-database_pos_KM=pd.merge(database_pos_KM,ID_Bologna,how='inner',on=['ID_PER'])
+dataset_bolo_exit=pd.merge(ID_Bologna,analisi_uscite_updated,how='inner',on=[names.names.ID])#dataset with the hospital exits merged with the ID of the patients 
+dataset_bolo_exit_pos=pd.merge(ID_positives,dataset_bolo_exit,how='inner', on=[names.names.ID])#limiting the dataset to noly positive patients
+
+#creating the 2 main datasets for the analysis
+dataset_bolo_hospital_path_pos=pd.merge(dataset_bolo_exit_pos,analysis_entries_updated,how='inner',on=[names.names.ID,names.names.setting,names.names.id_ricovero,names.names.inizio])#do the merge with the dataset of the hospital entries
+database_pos_KM=pd.merge(database_pos_KM,ID_Bologna,how='inner',on=[names.names.ID])
 
 
 
 
 
 # Modifying the dataset in order to have all the dates in the same format
-from datetime import datetime,timedelta
+# from datetime import datetime,timedelta
 
 
 
 
-for i in range(0, len(test_2.index)):
-    if test_2.DATA_INIZIO.iloc[i].month!=test_2.MESE_y.iloc[i]: 
-        month=test_2.DATA_INIZIO.iloc[i].month
-        day=test_2.DATA_INIZIO.iloc[i].day
-        test_2.DATA_INIZIO.iloc[i]=test_2['DATA_INIZIO'].iloc[i].replace(month=day,day=month)
-    if test_2.DATA_FINE.iloc[i].month!=test_2.MESE_x.iloc[i]: 
-        month1=test_2.DATA_FINE.iloc[i].month
-        day1=test_2.DATA_FINE.iloc[i].day
-        test_2.DATA_FINE.iloc[i]=test_2['DATA_FINE'].iloc[i].replace(month=day1,day=month1)
+for i in range(0, len(dataset_bolo_hospital_path_pos.index)):
+    if dataset_bolo_hospital_path_pos.DATA_INIZIO.iloc[i].month!=dataset_bolo_hospital_path_pos.MESE_y.iloc[i]: 
+        month_start=dataset_bolo_hospital_path_pos.DATA_INIZIO.iloc[i].month
+        day_start=dataset_bolo_hospital_path_pos.DATA_INIZIO.iloc[i].day
+        dataset_bolo_hospital_path_pos.DATA_INIZIO.iloc[i]=dataset_bolo_hospital_path_pos[names.names.inizio].iloc[i].replace(month=day,day=month)
+    if dataset_bolo_hospital_path_pos.DATA_FINE.iloc[i].month!=dataset_bolo_hospital_path_pos.MESE_x.iloc[i]: 
+        month_end=dataset_bolo_hospital_path_pos.DATA_FINE.iloc[i].month
+        day_end=dataset_bolo_hospital_path_pos.DATA_FINE.iloc[i].day
+        dataset_bolo_hospital_path_pos.DATA_FINE.iloc[i]=dataset_bolo_hospital_path_pos[names.names.fine].iloc[i].replace(month=day1,day=month1)
 
         
         

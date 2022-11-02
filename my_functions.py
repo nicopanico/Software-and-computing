@@ -18,6 +18,8 @@ from Classes_for_user import names,sett_hosp,patology
 
 ##1
 
+    
+    
 def create_target_ID_list(df, key_word, col_name):
     '''
  function in order to create a list containing the ID of all the patients with a certain resume
