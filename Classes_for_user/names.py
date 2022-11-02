@@ -22,6 +22,7 @@ class names:
     sesso="PER_KEY_SESSO"
     malattia="MALATTIA_IN_CORSO"
     descrizione_esenzione="Descrizione_Esenzione"
+    id_ricovero = "ID_RICOVERO"
 
 @dataclass(frozen=True)
 class keywords:

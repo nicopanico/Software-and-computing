@@ -2,7 +2,7 @@
 # coding: utf-8
 import sys,os
 
-os.chdir('C:\Desktop\Software-and-computing-main')
+os.chdir('C:\Desktop\software_computing\Software-and-computing')
 # sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 
 ##importing packages used in the script
@@ -19,6 +19,8 @@ from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions as ff
 from Classes_for_user import names,sett_hosp,patology
+
+
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
@@ -79,7 +81,7 @@ database_entries_bo_covid=database_entries_bo[database_entries_bo.SETTING.isin([
 #database for all the patients that have covid and are in covid settings
 database_entries_bo_covid_positives=pd.merge(database_entries_bo_covid,ID_positives,how='inner',on=[names.names.ID])
  
-# database_pos_KM=positivi_unibo.drop(iscovidnow)
+
 
 # Checking the number of positives deceased and comparing it with the patients deceased in covid departments
 #create the database containing the ID of all the positives also the non-hospitalized ones
@@ -165,7 +167,7 @@ dataset_pos_bolo_no_cov_int=dataset_tracking_bologna_positives.drop(isPosinCovid
 
 # Third contingency: taking into account only patients coming from noncovid settings
 
-# In[16]:
+
 isPoscov=[]
 list_cov_setting=sett_hosp.SettingList.covid_setting
 for i in range(0, len(list_cov_setting)):
@@ -175,111 +177,54 @@ for i in range(0, len(list_cov_setting)):
 dataset_pos_bolo_no_cov=dataset_tracking_bologna_positives.drop(isPoscov)
 #exclude all the patients from covid settings
 
-  
+#Building the contingencies and the final table with OR and p-values
 
 
-# FIRST contingency
-
+# First contingency
 set_int_results={}
 for ptlg in trial_list:
     ispat,isint=ff.create_contingency_single(dataset_pos_bolo_cov_int,ptlg,sett_hosp.hospital.intensiva_covid)
     contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,'Intensiva Covid')
-    set_int_results[ptlg] = OR
-    # dp=pd.DataFrame({ptlg.lower() : ispat,
-    #                'intensiva' : isint
-    #               })
-    # contingency=pd.crosstab(dp[ptlg.lower()], dp['intensiva'])
-    # OR, p=fisher_exact(contingency)
-    # set_int_results[ptlg]=OR
+    set_int_results[ptlg] = [OR,p]
+   
 
 
 # Second contingency
-
-# In[22]:
-
-
-ispat1=[]
-isint1=[]
 set_results_no_covid={}
 for ptlg in trial_list:
-    ispat1.clear()
-    isint1.clear()
-    for i in range(0, len(dataset_pos_bolo_no_cov)):
-                if ptlg in dataset_pos_bolo_no_cov['Descrizione_Esenzione'].iloc[i]:
-                    ispat1.append('SI')
-                else:
-                    ispat1.append('NO')
-                found=False
-                for k in list_setting_nocov:
-                    if k in dataset_pos_bolo_no_cov['SETTING'].iloc[i] and not found:
-                        isint1.append('SI')
-                        found=True
-                if not found:
-                    isint1.append('NO')
-   
-                   
-    dp=pd.DataFrame({ptlg.lower() : ispat1,
-                   'setting_noCovid' : isint1
-                  })
-    contingency=pd.crosstab(dp[ptlg.lower()], dp['setting_noCovid'])
-    OR, p=fisher_exact(contingency)
-    set_results_no_covid[ptlg]=OR
+    ispat,isint = ff.create_contingency_multiple(dataset_pos_bolo_no_cov,ptlg,list_setting_nocov)
+    contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,'Setting no covid')
+    set_results_no_covid[ptlg] = [OR,p]
+    
+    
     
 
 
 # Third contingency
-
-# In[23]:
-
-
-ispat2=[]
-isint2=[]
 set_results_covid_noint={}
 for ptlg in trial_list:
-    ispat2.clear()
-    isint2.clear()
-    for i in range(0, len(dataset_pos_bolo_no_cov_int.index)):
-                if ptlg in dataset_pos_bolo_no_cov_int['Descrizione_Esenzione'].iloc[i]:
-                    ispat2.append('SI')
-                else:
-                    ispat2.append('NO')
-                found=False
-                for k in list_setting_cov_noint:
-                    if k in dataset_pos_bolo_no_cov_int['SETTING'].iloc[i] and not found:
-                        isint2.append('SI')
-                        found=True
-                if not found:
-                    isint2.append('NO')
-   
-                   
-    dp=pd.DataFrame({ptlg.lower() : ispat2,
-                   'setting_covid' : isint2
-                  })
-    contingency=pd.crosstab(dp[ptlg.lower()], dp['setting_covid'])
-    OR, p=fisher_exact(contingency)
-    set_results_covid_noint[ptlg]=OR
+    ispat,isint = ff.create_contingency_multiple(dataset_pos_bolo_no_cov_int,ptlg,list_setting_cov_noint)
+    contingency,  OR, p = ff.build_contingency(ispat,isint,ptlg,'Setting covid without intensive care')
+    set_results_covid_noint[ptlg] = [OR, p]
+    
 
 
 # # Results
-
-# In[24]:
-
-
+#display the dataframe containing the double [OR, p] for the patologies for alle the 3 contingencies
 OD_compare=pd.DataFrame.from_dict([set_results_no_covid,set_results_covid_noint,set_int_results])
 OD_compare=OD_compare.rename(index={0:'setting no covid',2:'covid intensive care',1:'covid settings no int'})
-display(OD_compare)
 
 
-# # Kaplan-Meier
+
+"""
+Keplan-Meier analysis on the patients in covid intensive care
+"""
 
 # Processing of the data
-
-# In[17]:
-
-
-dataset_bolo_exit=pd.merge(ID_Bologna,analisi_uscite_updated,how='inner',on=['ID_PER'])
-dataset_bolo_exit_pos=pd.merge(ID_positives,dataset_bolo_exit,how='inner', on=['ID_PER'])
-test_2=pd.merge(dataset_bolo_exit_pos,analysis_entries_updated,how='inner',on=['ID_PER','SETTING','ID_RICOVERO','DATA_INIZIO'])
+database_pos_KM=positivi_unibo.drop(iscovidnow) #remove patients with on going covid using list created at line 63
+dataset_bolo_exit=pd.merge(ID_Bologna,analisi_uscite_updated,how='inner',on=[names.names.ID])
+dataset_bolo_exit_pos=pd.merge(ID_positives,dataset_bolo_exit,how='inner', on=[names.names.ID])
+test_2=pd.merge(dataset_bolo_exit_pos,analysis_entries_updated,how='inner',on=[names.names.ID,names.names.setting,names.names.id_ricovero,'DATA_INIZIO'])
 database_pos_KM=pd.merge(database_pos_KM,ID_Bologna,how='inner',on=['ID_PER'])
 
 
@@ -287,10 +232,6 @@ database_pos_KM=pd.merge(database_pos_KM,ID_Bologna,how='inner',on=['ID_PER'])
 
 
 # Modifying the dataset in order to have all the dates in the same format
-
-# In[48]:
-
-
 from datetime import datetime,timedelta
 
 
@@ -471,7 +412,7 @@ kfm.plot(ax=a1,ci_show=False)
 
 # Importing library and instantiate model
 
-# In[27]:
+
 
 
 from lifelines import CoxPHFitter
