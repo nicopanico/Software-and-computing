@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 import sys,os
-os.chdir('C:/Users/nicop/Desktop/software_computing/Software-and-computing')
+
+os.chdir('C:\Desktop\Software-and-computing-main')
 # sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 
 ##importing packages used in the script
@@ -174,33 +175,22 @@ for i in range(0, len(list_cov_setting)):
 dataset_pos_bolo_no_cov=dataset_tracking_bologna_positives.drop(isPoscov)
 #exclude all the patients from covid settings
 
-    
+  
 
 
 # FIRST contingency
 
-ispat=[]
-isint=[]
-
 set_int_results={}
 for ptlg in trial_list:
-    ispat.clear()
-    isint.clear()
-    for i in range(0, len(dataset_pos_bolo_cov_int.index)):
-        if ptlg in dataset_pos_bolo_cov_int['Descrizione_Esenzione'].iloc[i]:
-            ispat.append('SI')
-        else:
-            ispat.append('NO')
-        if 'TERAPIA INTENSIVA COVID' in dataset_pos_bolo_cov_int['SETTING'].iloc[i]:
-            isint.append('SI')
-        else:
-            isint.append('NO')
-    dp=pd.DataFrame({ptlg.lower() : ispat,
-                   'intensiva' : isint
-                  })
-    contingency=pd.crosstab(dp[ptlg.lower()], dp['intensiva'])
-    OR, p=fisher_exact(contingency)
-    set_int_results[ptlg]=OR
+    ispat,isint=ff.create_contingency_single(dataset_pos_bolo_cov_int,ptlg,sett_hosp.hospital.intensiva_covid)
+    contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,'Intensiva Covid')
+    set_int_results[ptlg] = OR
+    # dp=pd.DataFrame({ptlg.lower() : ispat,
+    #                'intensiva' : isint
+    #               })
+    # contingency=pd.crosstab(dp[ptlg.lower()], dp['intensiva'])
+    # OR, p=fisher_exact(contingency)
+    # set_int_results[ptlg]=OR
 
 
 # Second contingency

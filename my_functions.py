@@ -146,8 +146,29 @@ def create_contingency_multiple(df,ptlg,key_list):
                 if not found:
                     isint.append('NO')
       return(ispat,isint)
+  
 
+def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
+    """
+    Function to build the contingency table from the contingency lists and to get p-value and odds ratio
+    input:
+        ptlg==patology to give the name to first column
+        setting== setting for which you did the contingency list (e.g. TERAPIA INTENSIVA COVID)
+        ispat, isint==the contingency lists
+    Output:
+        contingency==contingency table
+        p==p-value
+        OR==odds-ratio
+    @Nicola2022
+    """
+    dp=pd.DataFrame({ptlg.lower() : ispat,
+                    setting : isint
+                  })
+    contingency=pd.crosstab(dp[ptlg.lower()], dp[setting])
+    OR, p=fisher_exact(contingency)
+    return(contingency,OR, p)
 
+    
 
 
 
