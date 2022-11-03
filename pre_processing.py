@@ -5,10 +5,11 @@ Created on Wed Nov  2 19:24:54 2022
 @author: iacop
 """
 ##importing packages used in the script
-import os
+import os,sys
 
 os.chdir('C:\Desktop\software_computing\Software-and-computing')
 
+sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 
 
 import pandas as pd
@@ -148,6 +149,17 @@ def setting_lists():
     return(list_cov_setting,list_setting_nocov,list_setting_cov_noint)
 
 def create_list_multiple_sett(df,target_list):
+    """
+    create a lsit containin the ID of patients that are in the list of settings
+    Inputs:
+        df==dataset where to take patients
+        target_list==list of setting to check
+    Output:
+        complete list of all the patients that are in that setting
+    """
+
+    
+    isPosnotcovint=[]
     for i in range(0, len(target_list)):
         list_pat=ff.create_target_ID_list(dataset_tracking_bologna_positives,target_list[i],key.setting)
         isPosnotcovint=list(set().union(list_pat,isPosnotcovint))
@@ -155,40 +167,28 @@ def create_list_multiple_sett(df,target_list):
     
 
 
-def contingency_datasets(dataset_tracking_bologna_positives,settlist,sub_list=[]):
+def contingency_datasets(df,settlist,sub_list=[]):
     """
-    
-   
+    create the dataset for the contingency tables
+    Inputs:
+        df==dataset where to take patients
+        settlist==list of setting to check
+        sub_list=list of settings to exlude in case a patient has been hospitalized in multiple settings
+    Output:
+        dataset_final==dataset containing the patients for that settings
     """
 
-    # First contingency: taking into account only patients from covid intensive care 
-    isPosnotcovint=[] 
-    isPosInt=[]
-    
-    isPosnotcovint=create_list_multiple_sett(dataset_tracking_bologna_positives,settlist)
+    isPosnotcovint=create_list_multiple_sett(df,settlist)
     if not sub_list:
-        dataset_final=dataset_tracking_bologna_positives[dataset_tracking_bologna_positives.index.isin(isPosnotcovint)]
+        dataset_final=df[df.index.isin(isPosnotcovint)]
     else:
-        isPosInt=create_list_multiple_sett(dataset_tracking_bologna_positives, sublist)
+        isPosInt=create_list_multiple_sett(df, sub_list)
         #now remove the patients that have been hospitalized also in setting unwanted
         isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
         #also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
-        dataset_final=dataset_tracking_bologna_positives[dataset_tracking_bologna_positives.index.isin(isPosnotcovint)]
+        dataset_final=df[df.index.isin(isPosnotcovint)]
     return(dataset_final)
 
 
-# Second contingency: taking into account only patients not from covid intensive care
-isPosinCovidint=ff.create_target_ID_list(dataset_tracking_bologna_positives,hosp.intensiva_covid,
-#dataset excluding patients who passed throught the covid intensive care setting
-dataset_pos_bolo_no_cov_int=dataset_tracking_bologna_positives.drop(isPosinCovidint)
 
-# Third contingency: taking into account only patients coming from noncovid settings
-IsPoscov=[]
-list_cov_setting=settlist.covid_setting
-for i in range(0, len(list_cov_setting)):
-    sett_list=ff.create_target_ID_list(dataset_tracking_bologna_positives,list_cov_setting[i],key.setting)
-    isPoscov=list(set().union(sett_list,isPoscov))
-    
-dataset_pos_bolo_no_cov=dataset_tracking_bologna_positives.drop(isPoscov)
-return(dataset_pos_bolo_cov_int,dataset_pos_bolo_cov_int,dataset_pos_bolo_no_cov)
 

@@ -19,7 +19,7 @@ from scipy.stats import fisher_exact
 # get_ipython().system('{sys.executable} -m pip install lifelines')
 import my_functions as ff
 from Classes_for_user import names,sett_hosp,patology,init_data
-from Classes_for_user import sett_hosp.hospital as
+
 # # OPENING THE CSV FILES
 # main datasets used for the script it could require time
 
