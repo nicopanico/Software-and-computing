@@ -11,7 +11,8 @@ Dataclass to define all the names used for the dataset columns
 
 """
 @dataclass(frozen=True)
-class names:
+class key_words:
+    #dataframe columns names
     inizio="DATA_INIZIO"
     fine="DATA_FINE"
     esito="DATA_ESITO"
@@ -23,11 +24,12 @@ class names:
     malattia="MALATTIA_IN_CORSO"
     descrizione_esenzione="Descrizione_Esenzione"
     id_ricovero = "ID_RICOVERO"
-
-@dataclass(frozen=True)
-class keywords:
+    #words inside the dataset columns as values
     decesso='DECESSO'
     esito="ESITO"
+
+
+    
     
     
     

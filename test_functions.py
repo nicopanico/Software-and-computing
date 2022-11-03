@@ -6,17 +6,16 @@ Created on Sat Sep 17 11:42:15 2022
 """
 import my_functions as ff
 import pandas as pd
-import hypothesis
+
 from hypothesis import strategies as st
 from hypothesis import settings
 from hypothesis import given
 from hypothesis.extra.pandas import data_frames, columns, column
-import pandera as pa
-from Classes_for_user import names,sett_hosp,patology
+from Classes_for_user.names import key_words as key
 
 
 
-
+##TESTS OF THE MODULE my_fucntions.py
 
 @given(df=data_frames(columns=columns(["SETTING","ID"],dtype=str),
                          rows=st.tuples(
@@ -52,7 +51,7 @@ def test_create_target_ID_list(df,key_word,col_name):
     elif not key_word:
         assert len(test_list)==0, "len of the list expected to be 0 for " ""
     #normal assertion
-    elif key_word in set(df[names.names.setting]):
+    elif key_word in set(df[key.setting]):
         assert len(test_list)==df[col_name].value_counts()[key_word], "expected the same number "
     
 
@@ -119,13 +118,13 @@ def test_create_contingency_single(df,ptlg,key_word):
     if not df.empty:
         ispat,isint=ff.create_contingency_single(df,ptlg,key_word)
         #normal assert on the setting
-        if key_word in set(df[names.names.setting]):
-            assert isint.count('SI')==df[names.names.setting].value_counts()[key_word]   
+        if key_word in set(df[key.setting]):
+            assert isint.count('SI')==df[key.setting].value_counts()[key_word]   
         else:
             assert isint.count('SI')==0
         #asserts on the patient patology list
-        if ptlg in set(df[names.names.descrizione_esenzione]):
-            assert ispat.count('SI')==df[names.names.descrizione_esenzione].value_counts()[ptlg]
+        if ptlg in set(df[key.descrizione_esenzione]):
+            assert ispat.count('SI')==df[key.descrizione_esenzione].value_counts()[ptlg]
         else:
             assert ispat.count('SI')==0
             
@@ -159,13 +158,15 @@ Notes:
         occurencies=df['SETTING'].value_counts()
         assert isint.count('SI')==occurencies[key_list].sum()
         #asserts on the patient patology list
-        if ptlg in set(df[names.names.descrizione_esenzione]):
-            assert ispat.count('SI')==df[names.names.descrizione_esenzione].value_counts()[ptlg]
+        if ptlg in set(df[key.descrizione_esenzione]):
+            assert ispat.count('SI')==df[key.descrizione_esenzione].value_counts()[ptlg]
         else:
             assert ispat.count('SI')==0
     
     
-    
+##TESTS OF THE MODULE pre_processing.py
+
+   
     
     
     

@@ -14,9 +14,13 @@ import statistics
 from scipy.stats import chi2_contingency
 from scipy.stats import fisher_exact
 from Classes_for_user import names,sett_hosp,patology
-#FUNCTIONS USED FOR THE SCRIPT
 
-##1
+
+
+"""
+Script containing all the basis functions used then in the other main scripts, those fucntions are all tested and used in the other
+scripts of the repository
+"""
 
     
     
@@ -45,7 +49,8 @@ def create_target_ID_list(df, key_word, col_name):
                           
     return(target_list) 
   
-   
+ 
+
 def deceased_list(df):
      """
      Function in order to count the number of deceased patients in a certain dataframe
