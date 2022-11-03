@@ -110,11 +110,11 @@ def create_contingency_single(df,ptlg,key_word):
        isint=[]
    
        for i in range(0, len(df.index)):
-            if ptlg in df[names.names.descrizione_esenzione].iloc[i]:
+            if ptlg in df[names.key_words.descrizione_esenzione].iloc[i]:
                 ispat.append('SI')
             else:
               ispat.append('NO')
-            if key_word in df[names.names.setting].iloc[i]:
+            if key_word in df[names.key_words.setting].iloc[i]:
                isint.append('SI')
             else:
               isint.append('NO')
@@ -141,13 +141,13 @@ def create_contingency_multiple(df,ptlg,key_list):
       ispat=[]
       isint=[]
       for i in range(0, len(df)):
-                if ptlg in df[names.names.descrizione_esenzione].iloc[i]:
+                if ptlg in df[names.key_words.descrizione_esenzione].iloc[i]:
                     ispat.append('SI')
                 else:
                     ispat.append('NO')
                 found=False
                 for k in key_list:
-                    if k in df[names.names.setting].iloc[i] and not found:
+                    if k in df[names.key_words.setting].iloc[i] and not found:
                         isint.append('SI')
                         found=True
                 if not found:
