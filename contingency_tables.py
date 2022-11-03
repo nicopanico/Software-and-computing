@@ -15,37 +15,59 @@ from Classes_for_user.init_data import covid_data as data
 
 
 trial_list=pat.patlist
-def define_contingency_tables(df1, df2, df3,list1,list2,trial_list=trial_list):
+def define_contingency_table_single(df, sett,table_name,patology=trial_list):
+    """
+    function to create contingencies and to append OR and p-value for all the patologies
+    using the already tested fucntions for contingency (for a single setting)
+    Input:
+        df==dataframe already prepared for contingency
+        sett==list containing the setting where you want to build the contingencies
+        table_name==string variable to give a name to table column
+        patology=trial list as default takes the patologies chosen a priori but can be modified with the lsit that you prefer to test
+    Output:
+        set_int_result==set containing p-value and OR taken from contingencies forr each patology
+    @Nicola2022
+    """
 
     # First contingency
     set_int_results={}
     for ptlg in trial_list:
-        ispat,isint=ff.create_contingency_single(df1,ptlg,hosp.intensiva_covid)
-        contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,'Intensiva Covid')
+        ispat,isint=ff.create_contingency_single(df,ptlg,sett)
+        contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,table_name)
         set_int_results[ptlg] = [OR,p]
+    return(set_int_results)
        
     
-    
-    # Second contingency
-    set_results_no_covid={}
+def define_contingency_table_multiple(df, sett_list,table_name,patology=trial_list):
+    """
+    function to create contingencies and to append OR and p-value for all the patologies
+    using the already tested fucntions for contingency (for a list of settings)
+    Input:
+        df==dataframe already prepared for contingency
+        sett_list==list containing the setting where you want to build the contingencies
+        table_name==string variable to give a name to table column
+        patology=trial list as default takes the patologies chosen a priori but can be modified with the lsit that you prefer to test
+    Output:
+        set_int_result==set containing p-value and OR taken from contingencies forr each patology
+    @Nicola2022
+    """ 
+    #check for possible NaN values in the list and remove them
+   
+        
+        
+    set_int_result={}
     for ptlg in trial_list:
-        ispat,isint = ff.create_contingency_multiple(df2,ptlg,list1)
-        contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,'Setting no covid')
-        set_results_no_covid[ptlg] = [OR,p]
+        ispat,isint = ff.create_contingency_multiple(df,ptlg,sett_list)
+        contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,table_name)
+        set_int_result[ptlg] = [OR,p]
+        
+    return(set_int_result)
         
         
         
     
     
-    # Third contingency
-    set_results_covid_noint={}
-    for ptlg in trial_list:
-        ispat,isint = ff.create_contingency_multiple(df3,ptlg,list2)
-        contingency,  OR, p = ff.build_contingency(ispat,isint,ptlg,'Setting covid without intensive care')
-        set_results_covid_noint[ptlg] = [OR, p]
-        
-    return(set_int_results,set_results_no_covid,set_results_covid_noint)
-    
+   
 
 
 def show_contingency_results(list1,list2,list3):

@@ -48,8 +48,8 @@ class SettingList:
 'ORTOPEDIA']
     covid_setting=['DEGENZA ORDINARIA COVID'  ,'SUB INTENSIVA COVID', 'DEGENZA COVID BASSA INTENSITA',
                    'TERAPIA INTENSIVA COVID']
-    covid_setting_no_int=['DEGENZA ORDINARIA COVID'  ,'SUB INTENSIVA COVID', 'DEGENZA COVID BASSA INTENSITA'
-                   ]
+    covid_setting_no_int=['DEGENZA ORDINARIA COVID'  ,'SUB INTENSIVA COVID', 'DEGENZA COVID BASSA INTENSITA']
+                   
     
     
     

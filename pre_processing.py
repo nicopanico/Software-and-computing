@@ -73,7 +73,8 @@ def create_list_multiple_sett(df,target_list):
     Output:
         complete list of all the patients that are in that setting
     """
-
+    if type(target_list)==str:
+        target_list=[target_list]
     
     isPosnotcovint=[]
     for i in range(0, len(target_list)):
@@ -93,8 +94,12 @@ def contingency_datasets(df,settlist,sub_list=[]):
     Output:
         dataset_final==dataset containing the patients for that settings
     """
-    settlist.append('NaN') #to consider the non hospitalized ones
-    isPosnotcovint=create_list_multiple_sett(df,settlist)
+    if type(settlist)==str:
+      settlist=[settlist]  
+      
+    settlist_complete=settlist
+    settlist_complete.append('NaN')#to consider the non hospitalized ones
+    isPosnotcovint=create_list_multiple_sett(df,settlist_complete)
     if not sub_list:
         dataset_final=df[df.index.isin(isPosnotcovint)]
     else:
@@ -103,6 +108,7 @@ def contingency_datasets(df,settlist,sub_list=[]):
         isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
         #also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
         dataset_final=df[df.index.isin(isPosnotcovint)]
+    settlist.remove('NaN')
     return(dataset_final)
 
 
