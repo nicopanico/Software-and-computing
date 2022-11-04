@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Sep 17 11:42:15 2022
 
-@author: nicop
-"""
 
 import my_functions as ff
 from hypothesis import strategies as st

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Nov  2 16:04:48 2022
 
-@author: iacop
-"""
 import os,sys
 sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 

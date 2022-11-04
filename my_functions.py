@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Sep 10 11:06:22 2022
 
-@author: nicop
-"""
 
 import pandas as pd
 import numpy as np
@@ -175,8 +171,21 @@ def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
     OR, p=fisher_exact(contingency)
     return(contingency,OR, p)
 
-    
 
+def correct_dates(df):
+    for i in range(0, len(df.index)):
+        if df.DATA_INIZIO.iloc[i].month!=df.MESE_y.iloc[i]: 
+            month_start=df.DATA_INIZIO.iloc[i].month
+            day_start=df.DATA_INIZIO.iloc[i].day
+            df.DATA_INIZIO.iloc[i]=df[names.key_words.inizio].iloc[i].replace(month=day_start,day=month_start)
+        if df.DATA_FINE.iloc[i].month!=df.MESE_x.iloc[i]: 
+            month_end=df.DATA_FINE.iloc[i].month
+            day_end=df.DATA_FINE.iloc[i].day
+            df.DATA_FINE.iloc[i]=df[names.key_words.fine].iloc[i].replace(month=day_end,day=month_end)
+    return(df)
+
+    
+    
 
 
 

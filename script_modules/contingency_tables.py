@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Nov  3 17:27:36 2022
 
-@author: iacop
-"""
 #importing packages
 import pandas as pd
 import my_functions as ff
