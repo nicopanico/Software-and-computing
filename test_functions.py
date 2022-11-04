@@ -12,7 +12,7 @@ from hypothesis import settings
 from hypothesis import given
 from hypothesis.extra.pandas import data_frames, columns, column
 from Classes_for_user.names import key_words as key
-
+import pre_processing
 
 
 ##TESTS OF THE MODULE my_fucntions.py
@@ -166,7 +166,14 @@ Notes:
     
 ##TESTS OF THE MODULE pre_processing.py
 
-   
+def  test_contingency_datasets(df,settlist,sub_list=[]):
+    dataset_final=pre_processing.contingency_datasets(df,settlist,sub_list=[])
+    
+    #first check that dataset final contains the wanted settings and the non hospitalized
+    counts=dataset_final.SETTING.isin(settlist).value_counts()
+    df_counts=df.SETTING.isin(settlist).value_counts()
+    assert counts[0]==df_counts[1], "Not the same values, you are missing some values"
+    
     
     
     
