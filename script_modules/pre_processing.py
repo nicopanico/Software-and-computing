@@ -102,6 +102,7 @@ def contingency_datasets(df,settlist,sub_list=[]):
       settlist=[settlist]  
     if df.empty:
         print("The input dataframe is empty, no operation performed")
+        return
     else:
         settlist_complete=settlist
         settlist_complete.append('NaN')#to consider the non hospitalized ones

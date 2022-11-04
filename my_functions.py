@@ -62,7 +62,7 @@ def deceased_list(df):
     will return an error
     @Nicola-2022
     """
-     if names.names.deceduto not in df.columns:
+     if names.key_words.deceduto not in df.columns:
         raise ValueError('{} is not in the dataframe columns,take a dataset with deceased data'.format('DECEDUTO'))
      else:
        deceased_list=[]

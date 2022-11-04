@@ -4,15 +4,14 @@ Created on Sat Sep 17 11:42:15 2022
 
 @author: nicop
 """
-import my_functions as ff
-import pandas as pd
 
+import my_functions as ff
 from hypothesis import strategies as st
 from hypothesis import settings
 from hypothesis import given
-from hypothesis.extra.pandas import data_frames, columns, column
+from hypothesis.extra.pandas import data_frames, columns
 from Classes_for_user.names import key_words as key
-import pre_processing
+from script_modules.pre_processing import contingency_datasets as cntg_dt
 
 
 ##TESTS OF THE MODULE my_fucntions.py
@@ -155,8 +154,13 @@ Notes:
     if not df.empty:
         ispat,isint=ff.create_contingency_multiple(df,ptlg,key_list)
         #normal assert on the settings
-        occurencies=df['SETTING'].value_counts()
-        assert isint.count('SI')==occurencies[key_list].sum()
+        d=df.isin(key_list)
+        falsy_check=d['SETTING'].value_counts()[False]
+        if falsy_check==len(df.index):
+            assert isint.count('SI')==0
+        else:
+            occurencies=df['SETTING'].value_counts()
+            assert isint.count('SI')==occurencies[key_list].sum()
         #asserts on the patient patology list
         if ptlg in set(df[key.descrizione_esenzione]):
             assert ispat.count('SI')==df[key.descrizione_esenzione].value_counts()[ptlg]
@@ -165,14 +169,20 @@ Notes:
     
     
 ##TESTS OF THE MODULE pre_processing.py
-
-def  test_contingency_datasets(df,settlist,sub_list=[]):
-    dataset_final=pre_processing.contingency_datasets(df,settlist,sub_list=[])
-    
-    #first check that dataset final contains the wanted settings and the non hospitalized
-    counts=dataset_final.SETTING.isin(settlist).value_counts()
-    df_counts=df.SETTING.isin(settlist).value_counts()
-    assert counts[0]==df_counts[1], "Not the same values, you are missing some values"
+@given(df=data_frames(columns=columns(["SETTING"],dtype=str),
+                         rows=st.tuples(
+                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)|OTHER SETTING",fullmatch=True),
+                             )),settlist=st.lists(st.from_regex("TERAPIA INTENSIVA \ (COVID|NO COVID)",fullmatch=True),min_size=1,unique=True))
+@settings(max_examples = 5)      
+def test_contingency_datasets(df,settlist):
+    if not df.empty:
+        dataset_final=cntg_dt(df,settlist)
+        if not dataset_final.empty:
+            #first check that dataset final contains the wanted settings and the non hospitalized
+            counts=dataset_final.SETTING.isin(settlist).value_counts()[True]
+            df_counts=df.SETTING.isin(settlist).value_counts()[True]
+            assert counts==df_counts, "Not the same values, you are missing some values"
+            assert len(dataset_final.index)==df_counts
     
     
     
