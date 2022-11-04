@@ -209,5 +209,3 @@ def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
 
 
 
-
-
