@@ -73,4 +73,5 @@ def show_contingency_results(list1,list2,list3):
     
     OD_compare=pd.DataFrame.from_dict([list1,list2,list3])
     OD_compare=OD_compare.rename(index={0:'setting no covid',2:'covid intensive care',1:'covid settings no int'})
+    return(OD_compare)
     print(OD_compare)

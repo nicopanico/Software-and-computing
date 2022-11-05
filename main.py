@@ -30,7 +30,7 @@ set_covid_no_int_result=contingency_tables.define_contingency_table_multiple(dat
 set_no_covid_result=contingency_tables.define_contingency_table_multiple(dataset_pos_bolo_no_cov,
                                                                                      list_setting_nocov,
                                                                                      'non covid settings')
-contingency_tables.show_contingency_results(set_no_covid_result,set_int_result,set_covid_no_int_result)
+OD_compare=contingency_tables.show_contingency_results(set_no_covid_result,set_int_result,set_covid_no_int_result)
 
 #Kaplan-Meierfitting and plots
 keplan_meier_db=Kaplan_Meier.kaplan_meier_dataset(df_for_KM,list_ID,sex_bolo)#create the right dataset for the kfm fitter
