@@ -10,7 +10,7 @@ from script_modules import pre_processing,contingency_tables,Kaplan_Meier
 .. MAIN SCRIPT..
 ----------------
 """
-
+#START OF THE CODE
 #importing all the datasets for the analysis
 dataset_tracking_bologna_positives=pre_processing.create_tracking_pos_dataset()#dataset for contingencies
 list_cov_setting,list_setting_nocov,list_setting_cov_noint=pre_processing.setting_lists()#lists of settings 
