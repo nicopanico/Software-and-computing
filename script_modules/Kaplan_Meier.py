@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def kaplan_meier_dataset(df,list_ID,sex_bolo):
     """
-    fucntion to define the dataset to use in the kaplan-meier analisys, the only difference is taht it takes into account patients
+    fucntion to define the dataset to use in the kaplan-meier analisys, the only difference is that it takes into account patients
     from their entry since their arrive in the covid intensive care or exit from hospital
     then rename some columsn and assign binary values to sex and intensive care covid
     @Nicola2022
@@ -20,7 +20,7 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
     tempdate=0
     wasintcovid=False
     for i in range(0,len(df.index)):
-        #reorganizing the dates and taking as final time or the end of intensive care or exit from hospital
+        #reorganizing the dates and taking as final time or the end of intensive care or exit from hospital and converting the time
             if tempID != df['ID_PER'].iloc[i]:
                     tempdate=df.DATA_FINE.iloc[i]
                     tempID=df['ID_PER'].iloc[i]
@@ -60,12 +60,11 @@ def kfm_fitter(df):
     kfm=KaplanMeierFitter()
     kfm.fit(durations=df['Giorni'], event_observed=df['Intensiva'])
     print(kfm.event_table)
-    print(kfm.survival_function_,'\n','Median survival time:',kfm.median_survival_time_)
     return(kfm)
 
 
 
-def plot_kfm_fitter(kfm):
+def show_plots_kfm(kfm):
     """
     Fucntion to plot the 2 curves for the fitter
     one of the nuymber of days before covid intensive care
@@ -78,10 +77,15 @@ def plot_kfm_fitter(kfm):
     plt.xlabel('Number of days before covid intensive care')
     plt.ylabel('Probability of survival')
     # plt.savefig('C:/Users/nicop/Desktop/KM')
+    plt.show()
+    
+    
+def show_plots_kfm_cumulative(kfm):
     kfm.plot_cumulative_density()
     plt.xlabel('Number of days before covid intensive care')
     plt.ylabel('Probability of going in intensive care')
-    # plt.savefig('C:/Users/nicop/Desktop/KM2')
+    plt.show()
+    
 
 
 def plot_M_F_fitter(df,kfm):
@@ -103,4 +107,6 @@ def plot_M_F_fitter(df,kfm):
     plt.title('Survival curve for males and females')
     plt.ylabel('Probability not to go in covid intensive care')
     kfm.plot(ax=a1,ci_show=False)
+    plt.show()
+    
 

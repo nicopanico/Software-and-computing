@@ -2,14 +2,10 @@
 
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import scipy.stats as stat
-import statistics
-from scipy.stats import chi2_contingency
+
+
 from scipy.stats import fisher_exact
-from Classes_for_user import names,sett_hosp,patology
+from Classes_for_user import names
 
 
 

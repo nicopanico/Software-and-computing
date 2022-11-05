@@ -4,7 +4,6 @@
 ##importing packages used in the script
 import os,sys
 
-os.chdir('C:\Desktop\software_computing\Software-and-computing')
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 
