@@ -173,16 +173,29 @@ def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
 
 
 def correct_dates(df):
-    for i in range(0, len(df.index)):
-        if df.DATA_INIZIO.iloc[i].month!=df.MESE_y.iloc[i]: 
-            month_start=df.DATA_INIZIO.iloc[i].month
-            day_start=df.DATA_INIZIO.iloc[i].day
-            df.DATA_INIZIO.iloc[i]=df[names.key_words.inizio].iloc[i].replace(month=day_start,day=month_start)
-        if df.DATA_FINE.iloc[i].month!=df.MESE_x.iloc[i]: 
-            month_end=df.DATA_FINE.iloc[i].month
-            day_end=df.DATA_FINE.iloc[i].day
-            df.DATA_FINE.iloc[i]=df[names.key_words.fine].iloc[i].replace(month=day_end,day=month_end)
-    return(df)
+    """
+    Function in order to reorder dates, sometimes dates are wrote in different formats (day-month or month-day) this function 
+    put the in order year-month-day, the dataframe provided needs to contain dates in a datetime format!
+    Input:
+        df==datafram with the dates to be corrected
+    Output:
+        df==same dataframe but with corrected dates
+    @Nicola2022
+    """
+    if not df.empty:
+        for i in range(0, len(df.index)):
+            if df.DATA_INIZIO.iloc[i].month!=df.MESE_y.iloc[i]: 
+                month_start=df.DATA_INIZIO.iloc[i].month
+                day_start=df.DATA_INIZIO.iloc[i].day
+                df.DATA_INIZIO.iloc[i]=df[names.key_words.inizio].iloc[i].replace(month=day_start,day=month_start)
+            if df.DATA_FINE.iloc[i].month!=df.MESE_x.iloc[i]: 
+                month_end=df.DATA_FINE.iloc[i].month
+                day_end=df.DATA_FINE.iloc[i].day
+                df.DATA_FINE.iloc[i]=df[names.key_words.fine].iloc[i].replace(month=day_end,day=month_end)
+        return(df)
+    else:
+        print("an empty dataset has been provided")
+        return
 
     
     

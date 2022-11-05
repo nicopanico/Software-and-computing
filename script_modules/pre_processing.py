@@ -57,7 +57,7 @@ def pre_processing_KM():
     This fucntions takes the imported data and do some merges and clearing of the data to have them ready for the analisys
     as inputs it takes the original data from the ini_data class
     the final result will be a dataframe, result of some merges and filtering (using already tested fucntions in my_fucntions)
-    and a list of ID as --> list_ID
+    and a list of ID as --> list_ID and a lsit of bologna sex for patients
     @Nicola2022
     """
 
@@ -107,82 +107,9 @@ def pre_processing_KM():
 
 
 
-# from lifelines import KaplanMeierFitter
-
-
-# # In[51]:
-
-
-# kfm=KaplanMeierFitter()
-# kfm.fit(durations=keplan_meier_db['Giorni'], event_observed=keplan_meier_db['Intensiva'])
-# print(kfm.event_table)
-# kfm.plot(ci_show=True)
-# plt.xlabel('Number of days before covid intensive care')
-# plt.ylabel('Probability of survival')
-# # plt.savefig('C:/Users/nicop/Desktop/KM')
-# print(kfm.survival_function_,'\n','Median survival time:',kfm.median_survival_time_)
-
-
-# # In[52]:
-
-
-# kfm.plot_cumulative_density()
-# plt.xlabel('Number of days before covid intensive care')
-# plt.ylabel('Probability of going in intensive care')
-# # plt.savefig('C:/Users/nicop/Desktop/KM2')
-
-
-# # In[53]:
-
-
-# groups = keplan_meier_db['sesso']   
-# i1 = (groups == 1)      ## group i1 , having the pandas series  for the 1st cohort
-# i2 = (groups == 0)     ## group i2 , having the pandas series  for the 2nd cohort
-
-
-# ## fit the model for 1st cohort
-# kfm.fit(keplan_meier_db['Giorni'][i1], keplan_meier_db['Intensiva'][i1], label='Males')
-# a1 = kfm.plot(ci_show=False)
-# kfm.fit(keplan_meier_db['Giorni'][i2], keplan_meier_db['Intensiva'][i2], label='Females')
-# plt.title('Survival curve for males and females')
-# plt.ylabel('Probability not to go in covid intensive care')
-# kfm.plot(ax=a1,ci_show=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # # Contingency tables of positive Bologna IDs
-
 def setting_lists():
     """
     define the settings lists from the classes

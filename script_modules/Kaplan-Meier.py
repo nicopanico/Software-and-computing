@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-
+from lifelines import KaplanMeierFitter
 
 
 
@@ -33,10 +33,7 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' not in df['SETTING'].iloc[i] and not wasintcovid:
                     if tempdate<df.DATA_FINE.iloc[i]:
                         tempdate=df.DATA_FINE.iloc[i]
-                        keplan_meier_db['Giorni'].iloc[-1]=((tempdate-df.DATA_ACCETTAZIONE.iloc[i]).total_seconds())/86400
-                    
-    
-                        
+                        keplan_meier_db['Giorni'].iloc[-1]=((tempdate-df.DATA_ACCETTAZIONE.iloc[i]).total_seconds())/86400        
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' in df['SETTING'].iloc[i]:
                     wasintcovid=True
                 
@@ -47,4 +44,45 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
     keplan_meier_db.rename(columns={'PER_KEY_SESSO':'sesso'}, inplace=True)
     keplan_meier_db['sesso']=[1 if x=='M' else 0 for x in keplan_meier_db['sesso'] ]
     return(keplan_meier_db)
+
+
+def kfm_fitter(df):
+    """
+    Function in order to create the fitter for the Kaplam-Meier model
+    Input:
+        
+    """
+    kfm=KaplanMeierFitter()
+    kfm.fit(durations=df['Giorni'], event_observed=df['Intensiva'])
+    print(kfm.event_table)
+    print(kfm.survival_function_,'\n','Median survival time:',kfm.median_survival_time_)
+
+
+
+
+kfm.plot(ci_show=True)
+plt.xlabel('Number of days before covid intensive care')
+plt.ylabel('Probability of survival')
+# plt.savefig('C:/Users/nicop/Desktop/KM')
+kfm.plot_cumulative_density()
+plt.xlabel('Number of days before covid intensive care')
+plt.ylabel('Probability of going in intensive care')
+# plt.savefig('C:/Users/nicop/Desktop/KM2')
+
+
+# In[53]:
+
+
+groups = keplan_meier_db['sesso']   
+i1 = (groups == 1)      ## group i1 , having the pandas series  for the 1st cohort
+i2 = (groups == 0)     ## group i2 , having the pandas series  for the 2nd cohort
+
+
+## fit the model for 1st cohort
+kfm.fit(keplan_meier_db['Giorni'][i1], keplan_meier_db['Intensiva'][i1], label='Males')
+a1 = kfm.plot(ci_show=False)
+kfm.fit(keplan_meier_db['Giorni'][i2], keplan_meier_db['Intensiva'][i2], label='Females')
+plt.title('Survival curve for males and females')
+plt.ylabel('Probability not to go in covid intensive care')
+kfm.plot(ax=a1,ci_show=False)
 

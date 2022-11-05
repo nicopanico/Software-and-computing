@@ -8,7 +8,7 @@ from hypothesis import given
 from hypothesis.extra.pandas import data_frames, columns
 from Classes_for_user.names import key_words as key
 from script_modules.pre_processing import contingency_datasets as cntg_dt
-
+import datetime
 
 ##TESTS OF THE MODULE my_fucntions.py
 
@@ -179,10 +179,59 @@ def test_contingency_datasets(df,settlist):
             df_counts=df.SETTING.isin(settlist).value_counts()[True]
             assert counts==df_counts, "Not the same values, you are missing some values"
             assert len(dataset_final.index)==df_counts
+   
+    
+   
+@given(df=data_frames(columns=columns(["DATA_INIZIO","MESE_y","DATA_FINE","MESE_x"],dtype=str),
+                         rows=st.tuples(
+                             st.datetimes(min_value=datetime.datetime(2020, 1, 1), max_value=datetime.datetime(2020, 1, 12),allow_imaginary=False),
+                             st.integers(min_value=1,max_value=12),
+                             st.datetimes(min_value=datetime.datetime(2020, 1, 1), max_value=datetime.datetime(2020, 1, 12),allow_imaginary=False),
+                             st.integers(min_value=1,max_value=12)
+                             )))
+@settings(max_examples = 5)    
+
+def test_correct_dates(df):
+    
+    """
+    Test that the fucntion correctly exchanges the moth with the day in case the corresponding value in the columns
+    mese doest not match with the motnh in the datetime
+    simple datframe given as input ,the test only assures that the switch is done properly under the fucntion conditions
+
+    """
+    if not df.empty:
+        months=[]
+        days=[]
+        for i in range(0,len(df.index)):
+            months.append(df.DATA_INIZIO.iloc[i].month)
+            days.append(df.DATA_INIZIO.iloc[i].day)
+            
+        df_corr=ff.correct_dates(df)
+        
+        months_corr=[]
+        days_corr=[]
+        for i in range(0,len(df_corr.index)):
+            months_corr.append(df_corr.DATA_INIZIO.iloc[i].month)
+            days_corr.append(df_corr.DATA_INIZIO.iloc[i].day)
+        
+        for i in range(0, len(df_corr.index)):
+            if df.DATA_INIZIO.iloc[i].month != df.MESE_y.iloc[i]:
+                assert months_corr[i]!=months[i]
+                assert days_corr[i] != days[i]
+            
+        
+        
+        
+    
+         
     
     
     
     
+    
+    
+    
+                       
     
 if __name__ == "main":
     pass                
