@@ -26,6 +26,14 @@ from Classes_for_user.init_data import covid_data as data
 
 
 def create_data_patologies(df_pat, df_ID):
+    """
+    Fucntion to create the dataset with the tracking of the patologies
+    Input: 
+        df_pat==data of the patologies
+        df_ID==data with the ID of the patients
+    Output:
+        dataset_bolo_patologies==df containing the patologies for pat. ID    
+    """
     dataset_patologies=df_pat[[key.descrizione_esenzione,key.ID]]
     dataset_bolo_patologies=pd.merge(df_ID,dataset_patologies, how='left', on=[key.ID])
     dataset_bolo_patologies=dataset_bolo_patologies.fillna('NaN') #fill the NaN with the string NaN
@@ -33,34 +41,44 @@ def create_data_patologies(df_pat, df_ID):
     return(dataset_bolo_patologies)
 
 def create_data_settings(df_entries,df_ID):
-    dataset_setting=data.analysis_entries_updated[[key.setting,key.ID]]
-    dataset_bolo_setting=pd.merge(data.ID_Bologna,dataset_setting, how='left', on=[key.ID])
-    dataset_bolo_setting=dataset_bolo_setting.fillna('NaN')
-
-def create_tracking_pos_dataset():
     """
-    function to create the dataset to use to create the various contingencies, dataset that tracks all the positives ID for bologna
-    Inputs:
-        Imported datasets from the class init_data
+    Fucntion to create the dataset with the tracking of the settings
+    Input: 
+        df_entries==data of the hospital entry for all the patients
+        df_ID==data with the ID of the patients
     Output:
-        desired dataset containing one columns for ID, one columns for the patology, one column for setting
-    @Nicola2022
+        dataset_bolo_setting==df containing the settings for pat. ID (even if they were not hospitalized they will have a NaN)  
     """
-    dataset_patologies=data.patologies[[key.descrizione_esenzione,key.ID]]
-    dataset_bolo_patologies=pd.merge(data.ID_Bologna,dataset_patologies, how='left', on=[key.ID])
-    dataset_bolo_patologies=dataset_bolo_patologies.fillna('NaN')
-    dataset_bolo_patologies=dataset_bolo_patologies.groupby([key.ID]).agg({key.descrizione_esenzione:','.join})
-    dataset_setting=data.analysis_entries_updated[[key.setting,key.ID]]
+    dataset_setting=df_entries[[key.setting,key.ID]]
     dataset_bolo_setting=pd.merge(data.ID_Bologna,dataset_setting, how='left', on=[key.ID])
     dataset_bolo_setting=dataset_bolo_setting.fillna('NaN')
-    dataset_tracking_bologna=pd.merge(dataset_bolo_patologies,dataset_bolo_setting, how='left',on=[key.ID])
-    
-    iscovidnow=ff.create_target_ID_list(data.positivi_unibo,key.malattia,key.esito)
-    
-    database_pos_outcome=data.positivi_unibo.drop(iscovidnow)#drop patients who still have covid
-    database_pos_outcome.drop_duplicates(subset=[key.ID], inplace=True)#and remove the duplciates ID
-    ID_positives=database_pos_outcome[key.ID] 
+    return(dataset_bolo_setting)
 
+def create_pos_outcome(df_pos):
+    """
+    fucntion to create the tracking fo the positive pat. IDs
+    Input: 
+        df_pos==data of the positives 
+    Output:
+        database_pos_outcome==df with the positive patients
+    """
+    iscovidnow=ff.create_target_ID_list(df_pos,key.malattia,key.esito)
+    database_pos_outcome=df_pos.drop(iscovidnow)#drop patients who still have covid
+    database_pos_outcome.drop_duplicates(subset=[key.ID], inplace=True)#and remove the duplciates ID
+    return (database_pos_outcome)
+    
+def create_tracking_pos_dataset(df_bolo_pat,df_bolo_sett,df_pos_outcome):
+    """
+    function to have the final dataset keep track of all the positive patients of Bologna
+    Input:
+        df_bolo_pat==df witht the patologies for patients
+        df_bolo_sett==df with settings for patients
+        df_pos_outcome==df with the positive patients with their settings and patologies
+    Output:
+        dataset_tracking_bologna_positives==dataset with complòete tracking of all the patologies and hospitalization for the positives
+    """
+    dataset_tracking_bologna=pd.merge(df_bolo_pat,df_bolo_sett, how='left',on=[key.ID])
+    ID_positives=df_pos_outcome[key.ID] 
     dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positives, how='inner', on=[key.ID])
     return(dataset_tracking_bologna_positives)
     
