@@ -2,8 +2,8 @@
 import pandas as pd
 from lifelines import KaplanMeierFitter
 import matplotlib.pyplot as plt
-
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def kaplan_meier_dataset(df,list_ID,sex_bolo):

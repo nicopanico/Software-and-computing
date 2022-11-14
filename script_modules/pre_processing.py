@@ -3,7 +3,7 @@
 
 ##importing packages used in the script
 import os,sys
-
+os.chdir('C:\Desktop\software_computing\Software-and-computing')
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__))) #to take the working dir as the curretn script directory
 
@@ -19,6 +19,23 @@ from Classes_for_user.sett_hosp import SettingList as settlist
 from Classes_for_user.names import key_words as key
 from Classes_for_user.patology import patologies as pat
 from Classes_for_user.init_data import covid_data as data
+
+
+
+
+
+
+def create_data_patologies(df_pat, df_ID):
+    dataset_patologies=df_pat[[key.descrizione_esenzione,key.ID]]
+    dataset_bolo_patologies=pd.merge(df_ID,dataset_patologies, how='left', on=[key.ID])
+    dataset_bolo_patologies=dataset_bolo_patologies.fillna('NaN') #fill the NaN with the string NaN
+    dataset_bolo_patologies=dataset_bolo_patologies.groupby([key.ID]).agg({key.descrizione_esenzione:','.join}) #group per ID the dataset
+    return(dataset_bolo_patologies)
+
+def create_data_settings(df_entries,df_ID):
+    dataset_setting=data.analysis_entries_updated[[key.setting,key.ID]]
+    dataset_bolo_setting=pd.merge(data.ID_Bologna,dataset_setting, how='left', on=[key.ID])
+    dataset_bolo_setting=dataset_bolo_setting.fillna('NaN')
 
 def create_tracking_pos_dataset():
     """
@@ -158,19 +175,19 @@ def contingency_datasets(df,settlist,sub_list=[]):
     if df.empty:
         print("The input dataframe is empty, no operation performed")
         return
-    else:
-        settlist_complete=settlist
-        settlist_complete.append('NaN')#to consider the non hospitalized ones
-        isPosnotcovint=create_list_multiple_sett(df,settlist_complete)
-        if not sub_list:
-            dataset_final=df[df.index.isin(isPosnotcovint)]
-        else:
-            isPosInt=create_list_multiple_sett(df, sub_list)
-            #now remove the patients that have been hospitalized also in setting unwanted
-            isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
-            #also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
-            dataset_final=df[df.index.isin(isPosnotcovint)]
-        settlist.remove('NaN')
+   
+    settlist_complete=settlist
+    settlist_complete.append('NaN')#to consider the non hospitalized ones
+    isPosnotcovint=create_list_multiple_sett(df,settlist_complete)
+    if not sub_list:
+        dataset_final=df[df.index.isin(isPosnotcovint)]
+        
+    isPosInt=create_list_multiple_sett(df, sub_list)
+    #now remove the patients that have been hospitalized also in setting unwanted
+    isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
+    #also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
+    dataset_final=df[df.index.isin(isPosnotcovint)]
+    settlist.remove('NaN')
     return(dataset_final)
 
 
