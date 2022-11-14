@@ -32,7 +32,8 @@ def create_data_patologies(df_pat, df_ID):
         df_pat==data of the patologies
         df_ID==data with the ID of the patients
     Output:
-        dataset_bolo_patologies==df containing the patologies for pat. ID    
+        dataset_bolo_patologies==df containing the patologies for pat. ID  
+    @Nicola2022
     """
     dataset_patologies=df_pat[[key.descrizione_esenzione,key.ID]]
     dataset_bolo_patologies=pd.merge(df_ID,dataset_patologies, how='left', on=[key.ID])
@@ -48,6 +49,7 @@ def create_data_settings(df_entries,df_ID):
         df_ID==data with the ID of the patients
     Output:
         dataset_bolo_setting==df containing the settings for pat. ID (even if they were not hospitalized they will have a NaN)  
+    @Nicola2022
     """
     dataset_setting=df_entries[[key.setting,key.ID]]
     dataset_bolo_setting=pd.merge(data.ID_Bologna,dataset_setting, how='left', on=[key.ID])
@@ -61,6 +63,7 @@ def create_pos_outcome(df_pos):
         df_pos==data of the positives 
     Output:
         database_pos_outcome==df with the positive patients
+    @Nicola2022
     """
     iscovidnow=ff.create_target_ID_list(df_pos,key.malattia,key.esito)
     database_pos_outcome=df_pos.drop(iscovidnow)#drop patients who still have covid
@@ -76,6 +79,7 @@ def create_tracking_pos_dataset(df_bolo_pat,df_bolo_sett,df_pos_outcome):
         df_pos_outcome==df with the positive patients with their settings and patologies
     Output:
         dataset_tracking_bologna_positives==dataset with complòete tracking of all the patologies and hospitalization for the positives
+    @Nicola2022
     """
     dataset_tracking_bologna=pd.merge(df_bolo_pat,df_bolo_sett, how='left',on=[key.ID])
     ID_positives=df_pos_outcome[key.ID] 

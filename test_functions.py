@@ -8,7 +8,9 @@ from hypothesis import given
 from hypothesis.extra.pandas import data_frames, columns
 from Classes_for_user.names import key_words as key
 from script_modules.pre_processing import contingency_datasets as cntg_dt
+from script_modules import pre_processing
 import datetime
+import pandas as pd
 
 ##TESTS OF THE MODULE my_fucntions.py
 
@@ -165,6 +167,81 @@ Notes:
     
     
 ##TESTS OF THE MODULE pre_processing.py
+#test fucntions to create datasets for contingencies
+
+#------------------------------------------------------------------------------------------------------
+#testing the function create_data_patologies
+
+#test1
+df1=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2'],'ID_PER':[1,2]})
+df2=pd.DataFrame({'ID_PER':[1,2]})
+def test_create_data_patologies(df_pat=df1,df_ID=df2):
+    """
+    case1: the ID between 2 datasets are the same
+    Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
+    Inputs:
+        df1==dataframe containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
+        df2==dataframe containing a columsn with ID
+    Outputs:
+        Output dataframe has to be correctly merged using ID as a key,
+        The Same ID have to be grouped with relative patologies
+        df with 2 columns with ID: [1,2] and Decsrizione_Esenzione:[patol1,patol2] and a second
+        df with ID:[1,2] the expected output df has to be 2 rows with ID=1 has patol1 and ID=2 has patol2
+    """
+    dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
+    #assert that equal IDs give a df with the same columns of the input df of the ID
+    assert(len(dataset_bolo_pat.index))==len(df2.index) 
+    #assert that ID=1 has patol1 in the column, which mean that the merge i corretcly assigning the patologies to the right ID
+    assert(dataset_bolo_pat['Descrizione_Esenzione'].iloc[0]=='patol1')
+
+#test2
+df1=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2','patol3'],'ID_PER':[1,2,2]})
+df2=pd.DataFrame({'ID_PER':[2,4]})
+def test_create_data_patologies(df_pat=df1,df_ID=df2):
+    """
+    case2: the first dataset has some ID that are repeating becasue they have different patologies 
+    Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
+    Inputs:
+        df1==dataframe containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
+        df2==dataframe containing a columsn with ID
+    Outputs:
+        Output dataframe has to be correctly merged using ID as a key,
+        The Same ID have to be grouped with relative patologies
+        df with 2 columns with ID: [1,2,2] and Decsrizione_Esenzione:[patol1,patol2,'patol3'] and a second
+        df with ID:[2,4] the expected output df has to be  rows with ID=1 has patol1 and ID=2 has patol2,patol3
+        to be sure the groupby is working correctly
+        
+    """
+    dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
+    #assert that ID=2 has patol2,patol3 in the column, which mean that the groupby is working as intended
+    data_test=dataset_bolo_pat
+    patol_id=data_test[data_test['Descrizione_Esenzione'].isin(['patol2,patol3'])]
+    assert patol_id.index==2
+
+
+#test3
+df1=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2','patol3'],'ID_PER':[1,2,2]})
+df2=pd.DataFrame({'ID_PER':[5,6]})
+def test_create_data_patologies(df_pat=df1,df_ID=df2):
+    """
+    case3: no common ID
+    Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
+    Inputs:
+        df1==dataframe containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
+        df2==dataframe containing a columsn with ID which are different from the other df1
+    Outputs:
+        Output dataframe has to be correctly merged using ID as a key,
+        The output df has to be formed by 2 rows with NaN in Descrizione_Esenzione and ID=5,6
+        check the NaN to be corrected into strings
+    """
+    dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
+    #assert that ID=2 has patol2,patol3 in the column, which mean that the groupby is working as intended
+    data_test=dataset_bolo_pat
+    patol=data_test['Descrizione_Esenzione']
+    assert((patol=='NaN').value_counts()[True])==2
+    assert patol_id.index==2
+
+
 @given(df=data_frames(columns=columns(["SETTING"],dtype=str),
                          rows=st.tuples(
                              st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)|OTHER SETTING",fullmatch=True),
@@ -223,7 +300,7 @@ def test_correct_dates(df):
         
         
     
-         
+      
     
     
     
