@@ -44,7 +44,7 @@ def create_data_patologies(df_pat, df_ID):
 def create_data_settings(df_entries,df_ID):
     """
     Fucntion to create the dataset with the tracking of the settings
-    Input: 
+    Inputs: 
         df_entries==data of the hospital entry for all the patients
         df_ID==data with the ID of the patients
     Output:
@@ -89,61 +89,95 @@ def create_tracking_pos_dataset(df_bolo_pat,df_bolo_sett,df_pos_outcome):
 
 ##PRE PROCESSING FOR KM
 
-def pre_processing_KM():
-    
+
+
+def create_dataset_exit(df_out,df_ID,df_exit):
     """
-    This fucntions takes the imported data and do some merges and clearing of the data to have them ready for the analisys
-    as inputs it takes the original data from the ini_data class
-    the final result will be a dataframe, result of some merges and filtering (using already tested fucntions in my_fucntions)
-    and a list of ID as --> list_ID and a lsit of bologna sex for patients
+    Function to create the dataset for the hospital path of bologna positives patients based on the key=ID_PER
+    Inputs:
+        df_out==df of the positive patients
+        df_ID== df of the IDs of Bologna
+        df_exit== df of the hospital exit containing IDs, settings, dates of entry and exit, esito
+    Output:
+        dataset_bolo_hospital_path_pos==df containign all the hospital path of the positive patients with their IDs, settings
+        dates and if they are recovered or deceased
     @Nicola2022
     """
-
-   
-    #some pre processing with the imported data
-    iscovidnow=ff.create_target_ID_list(data.positivi_unibo,key.malattia,key.esito)
-    database_pos_outcome=data.positivi_unibo.drop(iscovidnow)
-    database_pos_outcome.drop_duplicates(subset=[key.ID], inplace=True)
-    ID_positives=database_pos_outcome[key.ID] 
-    sex_bolo=data.anag_comune_bo[[key.sesso,key.ID]]
-    
-    database_pos_KM=data.positivi_unibo.drop(iscovidnow)
-    database_pos_KM=pd.merge(database_pos_KM,data.ID_Bologna,how='inner',on=[key.ID])
-    
-     
-    database_pos_KM=data.positivi_unibo.drop(iscovidnow) #remove patients with on going covid using list created at line 63
-    dataset_bolo_exit=pd.merge(data.ID_Bologna,data.analisi_uscite_updated,how='inner',on=[key.ID])#dataset with the hospital exits merged with the ID of the patients 
+    ID_positives=df_out[key.ID] 
+    dataset_bolo_exit=pd.merge(df_ID,df_exit,how='inner',on=[key.ID])#dataset with the hospital exits merged with the ID of the patients 
     dataset_bolo_exit_pos=pd.merge(ID_positives,dataset_bolo_exit,how='inner', on=[key.ID])#limiting the dataset to only positive patients
     
     #creating the 2 main datasets for the analysis
-    dataset_bolo_hospital_path_pos=pd.merge(dataset_bolo_exit_pos,data.analysis_entries_updated,how='inner',on=[key.ID,key.setting,key.id_ricovero,key.inizio])#do the merge with the dataset of the hospital entries
-    database_pos_KM=pd.merge(database_pos_KM,data.ID_Bologna,how='inner',on=[key.ID])
+    return(dataset_bolo_exit_pos)
+
+def create_dataset_hospital_path(df_pos_exit,df_entry):
+    """
+    function to create a dataset that keeps track of all the positive patients hospitalized 
+    mixing the dataset of hospital entry and the the dataset of hospitale exit
+    Inputs:
+        df_pos_exit==df with the positive patients and their path in the hopsital taken from the dataset analisi_uscite
+        df_entry== df containing the hospital path of the entry for patients
+    Outputs:
+        dataset_bolo_hospital_path_pos== df with complete hospital path from entry to exit with settings, aptologies, dates
+    @Nicola2022
+    """
+    dataset_bolo_hospital_path_pos=pd.merge(df_pos_exit,df_entry,how='inner',on=[key.ID,key.setting,key.id_ricovero,key.inizio])#do the merge with the dataset of the hospital entries
+    return(dataset_bolo_hospital_path_pos)
+
+def create_dataset_KM(df_path,df_out):
+    """
+    Function to create the pre-processed dataset that will be used in the KM analysis
+    this is a normal merge, the real check of the function is made on those patients who have the DATA_ACCETTAZIONE>DATA_FINE
+    which means patients that went out the hopsital before entering, those patients got eliminated (due to impossibilities on tracking them well)
+    Inputs:
+        df_path==df with the hospital path of patients
+        df_out== df with the positive patients and their resume
+    Output:
+        df_pos_rec_KM==final dataset with corrected patients with a CLEAR hospital path
+    @Nicola2022
+    """
+    df_path=ff.correct_dates(df_path) #first correct dates
     
-    #the dates need to be corrected bcs some of them are bad written, not standard format
-    dataset_bolo_hospital_path_pos=ff.correct_dates(dataset_bolo_hospital_path_pos)
-    
-    dates=[]
-    df_pos_rec=pd.merge(dataset_bolo_hospital_path_pos[['ID_PER','SETTING','DATA_INIZIO','DATA_FINE','ID_RICOVERO','DURATA_GG','ETA_x']],database_pos_KM[['ID_PER','DATA_ESITO','DATA_ACCETTAZIONE']],how='left', on=['ID_PER'])
-    for i in range(0, len(df_pos_rec.index)):
-        if df_pos_rec.DATA_ACCETTAZIONE.iloc[i]>df_pos_rec.DATA_FINE.iloc[i]:
-             dates.append(i)
-        df_pos_rec1=df_pos_rec.drop(dates)
-    df_pos_rec1.rename(columns={'ETA_x':'ETA'}, inplace=True)
-    
-    
+    df_pos_rec=pd.merge(df_path[['ID_PER','SETTING','DATA_INIZIO','DATA_FINE','ID_RICOVERO','DURATA_GG','ETA_x']],
+                        df_out[['ID_PER','DATA_ESITO','DATA_ACCETTAZIONE']],how='left', on=['ID_PER'])
+ 
+    DateAcc=df_pos_rec['DATA_ACCETTAZIONE']
+    DateEnd=df_pos_rec['DATA_FINE']
+    DiffDateBool=DateAcc>DateEnd
+    df_pos_rec_KM=df_pos_rec[DiffDateBool]
+    #rename the column ETA_x as simply ETA to define the age of the patients
+    df_pos_rec_KM.rename(columns={'ETA_x':'ETA'}, inplace=True)
+    return(df_pos_rec_KM)
+
+
+def create_list_sex(df_anag):
+    """
+    fucntion to create the list of all the ppl of Bologna with their sex (M or F)
+    Inputs:
+        df_anag==df with anagrafic infos
+    Output:
+        sex_bolo==list with all the informations relative to the sex of IDs
+    @Nicola2022
+    """
+    sex_bolo=data.anag_comune_bo[[key.sesso,key.ID]]
+    return(sex_bolo)
+
+def create_intensive_ID_list(df_path):
+    """
+    Function to get the list of ID patients who were in covid intensive care
+    Inputs:
+        df_path==df of the path of the patients inside the hospital
+    Output:
+        ID_list==list of all the patient IDs who were in covid intensive care
+    @Nicola2022
+    """
     #starting time= time of starting positivity
     #finale time= entry in intensive care covid or hospital exit
     # Restricting the analysis to all the hospitalized patients who had covid ongoing
-    list_ID=set()
-    for i in range(0, len(dataset_bolo_hospital_path_pos.index)):
-        if 'TERAPIA INTENSIVA COVID' in dataset_bolo_hospital_path_pos['SETTING'].iloc[i]:
-            list_ID.add(dataset_bolo_hospital_path_pos['ID_PER'].iloc[i])
-           
-    return(df_pos_rec1,list_ID,sex_bolo)
-
-
-
-
+    isIntCovid=df_path['SETTING'].isin(['TERAPIA INTENSIVA COVID'])
+    df_int_covid=df_path[isIntCovid]
+    ID_list=list(df_int_covid['ID_PER'])
+    return(ID_list)
 
 
 

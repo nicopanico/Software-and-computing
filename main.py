@@ -11,7 +11,7 @@ from script_modules import pre_processing,contingency_tables,Kaplan_Meier
 ----------------
 """
 #START OF THE CODE
-#importing all the datasets for the analysis
+#PRE PROCESS DATA FOR CONTINGENCIES ANALYSIS
 dataset_bolo_patologies=pre_processing.create_data_patologies(data.patologies,data.ID_Bologna)
 dataset_bolo_setting=pre_processing.create_data_settings(data.analysis_entries_updated,data.ID_Bologna)
 database_pos_outcome=pre_processing.create_pos_outcome(data.positivi_unibo)
@@ -19,8 +19,13 @@ database_pos_outcome=pre_processing.create_pos_outcome(data.positivi_unibo)
 dataset_tracking_bologna_positives=pre_processing.create_tracking_pos_dataset(dataset_bolo_patologies,dataset_bolo_setting,database_pos_outcome)
 
 
-dataset_tracking_bologna_positives=pre_processing.create_tracking_pos_dataset()#dataset for contingencies
 list_cov_setting,list_setting_nocov,list_setting_cov_noint=pre_processing.setting_lists()#lists of settings 
+#PRE PROCESS DATA FOR KM ANALYSIS
+dataset_bolo_exit_pos=pre_processing.create_dataset_exit(database_pos_outcome,data.ID_Bologna,data.analisi_uscite_updated)
+dataset_bolo_hospital_path_pos=pre_processing.create_dataset_hospital_path(dataset_bolo_exit_pos,data.analysis_entries_updated)
+
+
+                                                    
 df_for_KM,list_ID,sex_bolo=pre_processing.pre_processing_KM()#structures used for the kaplan-meier
 
 #contingency analysis
