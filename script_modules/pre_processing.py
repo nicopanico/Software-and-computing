@@ -86,7 +86,7 @@ def create_tracking_pos_dataset(df_bolo_pat,df_bolo_sett,df_pos_outcome):
     dataset_tracking_bologna_positives=pd.merge(dataset_tracking_bologna,ID_positives, how='inner', on=[key.ID])
     return(dataset_tracking_bologna_positives)
     
-
+#------------------------------------------------------------------------------
 ##PRE PROCESSING FOR KM
 
 
@@ -144,13 +144,12 @@ def create_dataset_KM(df_path,df_out):
     DateAcc=df_pos_rec['DATA_ACCETTAZIONE']
     DateEnd=df_pos_rec['DATA_FINE']
     DiffDateBool=DateAcc>DateEnd
-    df_pos_rec_KM=df_pos_rec[DiffDateBool]
     #rename the column ETA_x as simply ETA to define the age of the patients
-    df_pos_rec_KM.rename(columns={'ETA_x':'ETA'}, inplace=True)
+    df_pos_rec_KM=df_pos_rec[~DiffDateBool]
     return(df_pos_rec_KM)
 
 
-def create_list_sex(df_anag):
+def create_df_sex(df_anag):
     """
     fucntion to create the list of all the ppl of Bologna with their sex (M or F)
     Inputs:
@@ -180,6 +179,7 @@ def create_intensive_ID_list(df_path):
     return(ID_list)
 
 
+#------------------------------------------------------------------------------
 
 # # Contingency tables of positive Bologna IDs
 def setting_lists():

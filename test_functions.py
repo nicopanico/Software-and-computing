@@ -187,6 +187,7 @@ def test_create_data_patologies(df_pat=df1,df_ID=df2):
         The Same ID have to be grouped with relative patologies
         df with 2 columns with ID: [1,2] and Decsrizione_Esenzione:[patol1,patol2] and a second
         df with ID:[1,2] the expected output df has to be 2 rows with ID=1 has patol1 and ID=2 has patol2
+     @Nicola2022
     """
     dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
     #assert that equal IDs give a df with the same columns of the input df of the ID
@@ -210,7 +211,7 @@ def test_create_data_patologies2(df_pat=df1,df_ID=df2):
         df with 2 columns with ID: [1,2,2] and Decsrizione_Esenzione:[patol1,patol2,'patol3'] and a second
         df with ID:[2,4] the expected output df has to be  rows with ID=1 has patol1 and ID=2 has patol2,patol3
         to be sure the groupby is working correctly
-        
+    @Nicola2022
     """
     dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
     #assert that ID=2 has patol2,patol3 in the column, which mean that the groupby is working as intended
@@ -233,6 +234,7 @@ def test_create_data_patologies3(df_pat=df1,df_ID=df2):
         Output dataframe has to be correctly merged using ID as a key,
         The output df has to be formed by 2 rows with NaN in Descrizione_Esenzione and ID=5,6
         check the NaN to be corrected into strings
+    @Nicola2022
     """
     dataset_bolo_pat=pre_processing.create_data_patologies(df_pat,df_ID)
     #assert that ID=2 has patol2,patol3 in the column, which mean that the groupby is working as intended
@@ -256,6 +258,7 @@ def test_create_data_settings(df_sett=df1,df_ID=df2):
     Outputs:
         Output df has to be correclty merged
         If the ID are shared the expected df have 2 rows with sett1 for ID=1 anbd sett2 for ID=2
+     @Nicola2022
     """
     test_df=pre_processing.create_data_settings(df_sett,df_ID)
     assert(len(test_df.index))==len(df2.index)
@@ -275,6 +278,7 @@ def test_create_data_settings2(df_sett=df1,df_ID=df2):
         Output dataframe has to be correclty merged
         If the ID are not totally shared, the expected df have 2 rows with the IDs from df2 one ID with sett2 and the other with
         NaN properly filled as a string
+     @Nicola2022
     """
     test_df=pre_processing.create_data_settings(df_sett,df_ID)
     sett=test_df['SETTING']
@@ -294,6 +298,7 @@ def test_crate_pos_outcome(df_pos=df1):
     Outputs:
         Output dataframe has to have only patients with the covid recovered or dead from covid
         and the duplicates have to be properly dropped, so the final df is expetced to have 3 rows with IDs=[2,3,4]
+     @Nicola2022
     """
     test_df=pre_processing.create_pos_outcome(df_pos)
     status=test_df['ESITO']
@@ -326,32 +331,134 @@ def test_create_tracking_pos_dataset(df_pat=df1,df_sett=df2, df_out=df3):
             create_data_patologies, create_data_setting, create_pos_outcome
             so it is already tested that the input df will be as wanted,
             Test that the inner merge will take the IDs as intended
-        
+    @Nicola2022
     """
     test_df=pre_processing.create_tracking_pos_dataset(df_pat,df_sett,df_out)
     #test the ID to be taken in the correct way, expected to be 4
     assert len(test_df['ID_PER'])==4
 
 #------------------------------------------------------------------------------
+#TESTS OF THE FUCNTIONS FOR KM ANALYSIS
 
+#test the fucntion create_dataset_exit
+#test1
 
+df1=pd.DataFrame({'ID_PER':[1,2,3],'ESITO':['pos','pos','pos']})
+df2=pd.DataFrame({'ID_PER':[1,2,3,4,5]})
+df3=pd.DataFrame({'ID_PER':[1,2,3],'SETTING':['sett1','sett2','sett3'],'DATA_INIZIO':['02-13-22','04-24-22','03-16-22']})
 
+def test_create_dataset_exit(df_out=df1,df_ID=df2,df_exit=df3):
+    """
+    Test that the fucntion is correcting doing the mergin only on patients coming from hospital, ID_PER of df_exit
+    and also that the final dataset has all the wanted columns
+    Inputs:
+        df_out==df of the ID positives with their covid status
+        df_ID==df with all the IDs
+        df_exit==df with the hospital exit details
+    Output:
+        df has to have the same columns of the df_exit but regarding only positive patients with full covid status (no on-going)
+    @Nicola2022
+    """
+    test_df=pre_processing.create_dataset_exit(df_out,df_ID,df_exit)
+    colname=list(test_df.columns)
+    #assert that the database is correcdtly merged by checking if the columns are the desired one
+    assert colname==['ID_PER','SETTING','DATA_INIZIO']
+    #assert that the databse i correctly merged checking that the IDs are the ones from df.exit
+    IDs=list(test_df['ID_PER'])
+    exit_IDs=list(df_exit['ID_PER'])
+    assert IDs==exit_IDs
+    
+#test create_dataset_KM functin
+#test 1
 
+df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','sett2'],'DATA_INIZIO':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 4, 5)],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+                  'MESE_x':[3,5],'MESE_y':[5,5],'ID_RICOVERO':[1,2],'DURATA_GG':[10,10],'ETA_x':[22,22]})
+df2=pd.DataFrame({'ID_PER':[1,2],'DATA_ESITO':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 5, 22)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 4, 5)]})
+def test_create_dataset_KM(df_path=df1,df_out=df2):
+     """
+     Case1: Testing that giving 2 patients and taking one of them with a non-clear track the fucntion is exluding one of them
+     one aptient has DATA_ACCETTAZIONE which is set after the DATA_FINE, if the fucntion is correctly working this patient
+     will be removed
+     Inputs:
+         df_path==containing the hospital path
+         df_out==df with positive patients
+        Output:
+            df has to have the right number of rows based on the patients who have a clear path with the dates
+            the patient ID=1 has DATA_ACCETTAZIONE which is greater than DATA_FINE
+            has to be removed
+    @Nicola2022
+     """
+     test_df=pre_processing.create_dataset_KM(df_path,df_out)
+     #assert that the patient with data_fine < data_accetaazione has been removed (ID_PER=2)
+     assert len(test_df)==1
+     
 
+#test2
+    
+df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','sett2'],'DATA_INIZIO':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 4, 5)],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+                  'MESE_x':[3,5],'MESE_y':[5,5],'ID_RICOVERO':[1,2],'DURATA_GG':[10,10],'ETA_x':[22,22]})
+df2=pd.DataFrame({'ID_PER':[1,2],'DATA_ESITO':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 5, 22)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 17),datetime.datetime(2022, 6, 5)]})
+def test_create_dataset_KM2(df_path=df1,df_out=df2):
+     """
+     Case2: Testing that giving 2 patients with a dates path not clear the fucntion is exluding both of them
+     giving a dataframe with no values in the columns (but only columns names given by merge, which mean that also the merge is properly done)
+     @Nicola2022
 
+     """
+     test_df=pre_processing.create_dataset_KM(df_path,df_out)
+     #assert that the patient with data_fine < data_accetaazione has been removed (ID_PER=2)
+     assert len(test_df)==0
+         
+#test the functtion create_list_sex
 
+@given(df=data_frames(columns=columns(["ID_PER",'PER_KEY_SESSO','SETTING'],dtype=str),
+                         rows=st.tuples(
+                             st.integers(1),
+                             st.from_regex("M|F",fullmatch=True),
+                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)|OTHER SETTING",fullmatch=True)
+                             )))
+@settings(max_examples=5)
 
+def test_create_df_sex(df):
+    """
+    Test that the fucntion is correcly selecting the SEX and ID from the database and is not exluding any patient
+    Inputs:
+        df==test dataframe with ID SEX and SETTING
+    Output:
+        df with only information regarding sex and ID having the samen lenght of the initial df and without the SETTING 
+        columns
+    @Nicola2022
+    """
+    
+    test_df=pre_processing.create_df_sex(df)
+    assert len(test_df)==len(df)
+    assert 'SETTING' not in test_df
 
+#test the function create_intensive_ID_list
+df1=pd.DataFrame({'ID_PER':[1,2,3,4],'SETTING':['TERAPIA INTENSIVA COVID','sett1','TERAPIA INTENSIVA COVID','sett2']})
+def test_create_intensive_ID_list(df_path=df1):
+    """
+    Testing that the function is correcting taking the IDs from covid intensive care and putting them in a list
+    giving it as input a dataframe with 4 IDs and 2 of them have the columns SETTING in TERAPIA INTENSIVA COVID
+    it should take jsut those 2 as ID for the final list
+    Inputs:
+        df_path==dataframe containing ID and SETTING with some IDs that have TERAPIA INTENSIVA COVID as SETTING value
+    Output:
+        list has to containg the right ID, so the ones that are set in df1 to have the value TERAPIA INTENSIVA COVID
+    @Nicola2022
 
-
-
-
-
-
-
-
-
-
+    """
+    test_df=pre_processing.create_intensive_ID_list(df_path)
+    assert len(test_df)==2
+    #see if the IDs are the correct ones
+    checkSett=df_path['SETTING'].iloc[test_df[0]-1]#seeing ther setting of the ID in the list
+    #assert it to be TERAPIA INTENSIVA COVID
+    assert checkSett=='TERAPIA INTENSIVA COVID'
+    
+    
+   
 
 
 

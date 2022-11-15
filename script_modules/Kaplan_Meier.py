@@ -51,7 +51,7 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
 def kfm_fitter(df):
     """
     Function in order to create the fitter for the Kaplam-Meier model
-    Input:
+    Inputs:
         df==dataframe already filtered and prepared for the analisys
     Output:
         kfm=Kaplan-Meier fitter
