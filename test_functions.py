@@ -169,7 +169,7 @@ Notes:
 ##TESTS OF THE MODULE pre_processing.py
 #test fucntions to create datasets for contingencies
 
-#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 #testing the function create_data_patologies
 
 #test1
@@ -197,7 +197,7 @@ def test_create_data_patologies(df_pat=df1,df_ID=df2):
 #test2
 df1=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2','patol3'],'ID_PER':[1,2,2]})
 df2=pd.DataFrame({'ID_PER':[2,4]})
-def test_create_data_patologies(df_pat=df1,df_ID=df2):
+def test_create_data_patologies2(df_pat=df1,df_ID=df2):
     """
     case2: the first dataset has some ID that are repeating becasue they have different patologies 
     Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
@@ -222,7 +222,7 @@ def test_create_data_patologies(df_pat=df1,df_ID=df2):
 #test3
 df1=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2','patol3'],'ID_PER':[1,2,2]})
 df2=pd.DataFrame({'ID_PER':[5,6]})
-def test_create_data_patologies(df_pat=df1,df_ID=df2):
+def test_create_data_patologies3(df_pat=df1,df_ID=df2):
     """
     case3: no common ID
     Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
@@ -239,7 +239,71 @@ def test_create_data_patologies(df_pat=df1,df_ID=df2):
     data_test=dataset_bolo_pat
     patol=data_test['Descrizione_Esenzione']
     assert((patol=='NaN').value_counts()[True])==2
-    assert patol_id.index==2
+    assert patol.index==2
+
+#------------------------------------------------------------------------------
+#Test the function create_data_settings
+#test1
+df1=pd.DataFrame({'SETTING':['sett1','sett2'],'ID_PER':[1,2]})
+df2=pd.DataFrame({'ID_PER':[1,2]})
+def test_create_data_settings(df_sett=df1,df_ID=df2):
+    """
+    case1: common IDs, the ID of the settings are the same in the ID reference df
+    Test if the fucntion correctly does the merge for the 2 df of settings and IDs
+    Inputs:
+        df1==dataframe containing a columns with setting and a column with ID
+        df2==dataframe containing a columns with all the IDs
+    Outputs:
+        Output dataframe has to be correclty merged
+        If the ID are shared the expected df have 2 rows with sett1 for ID=1 anbd sett2 for ID=2
+    """
+    test_df=pre_processing.create_data_settings(df_sett,df_ID)
+    assert(len(test_df.index))==len(df2.index)
+    assert(test_df['SETTING'].iloc[0]=='sett1')#to test if it correclty merging the ID=1 witht the setting: sett1
+
+#test2
+df1=pd.DataFrame({'SETTING':['sett1','sett2'],'ID_PER':[1,2]})
+df2=pd.DataFrame({'ID_PER':[2,4]})
+def test_create_data_settings2(df_sett=df1,df_ID=df2):
+    """
+    Test if the fucntion correclty does the merge in the case which the IDs of the 2 df are not all the same, taking
+    the IDs of df2 as reference and also check that the NaN are properly filled with "NaN"
+     Inputs:
+        df1==dataframe containing a columns with setting and a column with ID
+        df2==dataframe containing a columns with all the IDs
+    Outputs:
+        Output dataframe has to be correclty merged
+        If the ID are not totally shared, the expected df have 2 rows with the IDs from df2 one ID with sett2 and the other with
+        NaN properly filled as a string
+    """
+    test_df=pre_processing.create_data_settings(df_sett,df_ID)
+    sett=test_df['SETTING']
+    assert((sett=='NaN').value_counts()[True])==1
+    assert sett.size==2
+#------------------------------------------------------------------------------
+#testing the function create_pos_outcome
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @given(df=data_frames(columns=columns(["SETTING"],dtype=str),

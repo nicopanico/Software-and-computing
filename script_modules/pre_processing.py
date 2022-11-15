@@ -52,7 +52,7 @@ def create_data_settings(df_entries,df_ID):
     @Nicola2022
     """
     dataset_setting=df_entries[[key.setting,key.ID]]
-    dataset_bolo_setting=pd.merge(data.ID_Bologna,dataset_setting, how='left', on=[key.ID])
+    dataset_bolo_setting=pd.merge(df_ID,dataset_setting, how='left', on=[key.ID])
     dataset_bolo_setting=dataset_bolo_setting.fillna('NaN')
     return(dataset_bolo_setting)
 
