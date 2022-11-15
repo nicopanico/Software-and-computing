@@ -15,18 +15,18 @@ from script_modules import pre_processing,contingency_tables,Kaplan_Meier
 dataset_bolo_patologies=pre_processing.create_data_patologies(data.patologies,data.ID_Bologna)
 dataset_bolo_setting=pre_processing.create_data_settings(data.analysis_entries_updated,data.ID_Bologna)
 database_pos_outcome=pre_processing.create_pos_outcome(data.positivi_unibo)
-
 dataset_tracking_bologna_positives=pre_processing.create_tracking_pos_dataset(dataset_bolo_patologies,dataset_bolo_setting,database_pos_outcome)
 
-
+#lists of settings
 list_cov_setting,list_setting_nocov,list_setting_cov_noint=pre_processing.setting_lists()#lists of settings 
 #PRE PROCESS DATA FOR KM ANALYSIS
 dataset_bolo_exit_pos=pre_processing.create_dataset_exit(database_pos_outcome,data.ID_Bologna,data.analisi_uscite_updated)
 dataset_bolo_hospital_path_pos=pre_processing.create_dataset_hospital_path(dataset_bolo_exit_pos,data.analysis_entries_updated)
-
-
+df_pos_rec_KM=pre_processing.create_dataset_KM(dataset_bolo_hospital_path_pos,database_pos_outcome)
+sex_bolo=pre_processing.create_list_sex(data.anag_comune_bo)
+ID_list=pre_processing.create_intensive_ID_list(dataset_bolo_hospital_path_pos)
                                                     
-df_for_KM,list_ID,sex_bolo=pre_processing.pre_processing_KM()#structures used for the kaplan-meier
+
 
 #contingency analysis
 dataset_pos_bolo_cov_int=pre_processing.contingency_datasets(dataset_tracking_bologna_positives,'TERAPIA INTENSIVA COVID')
@@ -45,7 +45,7 @@ set_no_covid_result=contingency_tables.define_contingency_table_multiple(dataset
 OD_compare=contingency_tables.show_contingency_results(set_no_covid_result,set_int_result,set_covid_no_int_result)
 
 #Kaplan-Meierfitting and plots
-keplan_meier_db=Kaplan_Meier.kaplan_meier_dataset(df_for_KM,list_ID,sex_bolo)#create the right dataset for the kfm fitter
+keplan_meier_db=Kaplan_Meier.kaplan_meier_dataset(df_pos_rec_KM,ID_list,sex_bolo)#create the right dataset for the kfm fitter
 kfm=Kaplan_Meier.kfm_fitter(keplan_meier_db)#perform the fitting
 Kaplan_Meier.show_plots_kfm(kfm)#first plots for generics kfm
 Kaplan_Meier.show_plots_kfm_cumulative(kfm)
