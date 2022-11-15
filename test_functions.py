@@ -303,7 +303,36 @@ def test_crate_pos_outcome(df_pos=df1):
     #assert that that the duplicates have been dropped
     assert len(test_df.index)==3
 
+#------------------------------------------------------------------------------
+#test the fucntion create_tracking_pos_dataset
 
+#test1
+df1=pd.DataFrame({'SETTING':['sett1','sett2','sett3','sett4'],'ID_PER':[1,2,3,4]})
+df2=pd.DataFrame({'Descrizione_Esenzione':['patol1','patol2','patol3','patol4'],'ID_PER':[1,2,3,4]})
+df3=pd.DataFrame({'ESITO':['pos','pos','pos','pos'],'ID_PER':[1,2,3,4]})
+def test_create_tracking_pos_dataset(df_pat=df1,df_sett=df2, df_out=df3):
+    """
+    Test that the fucntion correclty creates a dataset with all the tracking for positives 
+    with settings, patologies for the positive IDs
+    Inputs:
+        df1==df of the patologies with IDs
+        df2== df of the settings with the IDs
+        df3== containing the positive patients
+    Outputs:
+        The expected output df has to be correclty merged only for positive IDs containing for each ID its settings and
+        patologies
+        The test is expected to give as output a dataframe with 4 IDs with their setting and patol
+        In the script this fucntion uses as input the df created in the previous 3 fucntion :
+            create_data_patologies, create_data_setting, create_pos_outcome
+            so it is already tested that the input df will be as wanted,
+            Test that the inner merge will take the IDs as intended
+        
+    """
+    test_df=pre_processing.create_tracking_pos_dataset(df_pat,df_sett,df_out)
+    #test the ID to be taken in the correct way, expected to be 4
+    assert len(test_df['ID_PER'])==4
+
+#------------------------------------------------------------------------------
 
 
 
