@@ -202,8 +202,8 @@ def test_create_data_patologies2(df_pat=df1,df_ID=df2):
     case2: the first dataset has some ID that are repeating becasue they have different patologies 
     Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
     Inputs:
-        df1==dataframe containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
-        df2==dataframe containing a columsn with ID
+        df1==df containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
+        df2==df containing a columsn with ID
     Outputs:
         Output dataframe has to be correctly merged using ID as a key,
         The Same ID have to be grouped with relative patologies
@@ -227,8 +227,8 @@ def test_create_data_patologies3(df_pat=df1,df_ID=df2):
     case3: no common ID
     Test if the function correctly does the merge and groupby of the 2 input dataframes for the patologies and the ID
     Inputs:
-        df1==dataframe containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
-        df2==dataframe containing a columsn with ID which are different from the other df1
+        df1==df containing a columns with patologies (Descrizione_Esenzione) and a columsn with patologies
+        df2==df containing a columsn with ID which are different from the other df1
     Outputs:
         Output dataframe has to be correctly merged using ID as a key,
         The output df has to be formed by 2 rows with NaN in Descrizione_Esenzione and ID=5,6
@@ -251,10 +251,10 @@ def test_create_data_settings(df_sett=df1,df_ID=df2):
     case1: common IDs, the ID of the settings are the same in the ID reference df
     Test if the fucntion correctly does the merge for the 2 df of settings and IDs
     Inputs:
-        df1==dataframe containing a columns with setting and a column with ID
-        df2==dataframe containing a columns with all the IDs
+        df1==df containing a columns with setting and a column with ID
+        df2==df containing a columns with all the IDs
     Outputs:
-        Output dataframe has to be correclty merged
+        Output df has to be correclty merged
         If the ID are shared the expected df have 2 rows with sett1 for ID=1 anbd sett2 for ID=2
     """
     test_df=pre_processing.create_data_settings(df_sett,df_ID)
@@ -269,8 +269,8 @@ def test_create_data_settings2(df_sett=df1,df_ID=df2):
     Test if the fucntion correclty does the merge in the case which the IDs of the 2 df are not all the same, taking
     the IDs of df2 as reference and also check that the NaN are properly filled with "NaN"
      Inputs:
-        df1==dataframe containing a columns with setting and a column with ID
-        df2==dataframe containing a columns with all the IDs
+        df1==df containing a columns with setting and a column with ID
+        df2==df containing a columns with all the IDs
     Outputs:
         Output dataframe has to be correclty merged
         If the ID are not totally shared, the expected df have 2 rows with the IDs from df2 one ID with sett2 and the other with
@@ -282,6 +282,29 @@ def test_create_data_settings2(df_sett=df1,df_ID=df2):
     assert sett.size==2
 #------------------------------------------------------------------------------
 #testing the function create_pos_outcome
+#test1
+df1=pd.DataFrame({'ID_PER':[1,2,2,2,3,3,4],'ESITO':['MALATTIA_IN_CORSO','Guarito',
+                                                     'Guarito','Guarito','Guarito','Guarito','DECESSO']})
+def test_crate_pos_outcome(df_pos=df1):
+    """
+    Test that the fucntion correclty takes into account only patients who are recovered or deceased from covid and not the one
+    with the covid on-going
+    Inputs:
+        df1==df with the ID of the positives with the status of the covid in the column ESITO
+    Outputs:
+        Output dataframe has to have only patients with the covid recovered or dead from covid
+        and the duplicates have to be properly dropped, so the final df is expetced to have 3 rows with IDs=[2,3,4]
+    """
+    test_df=pre_processing.create_pos_outcome(df_pos)
+    status=test_df['ESITO']
+    stillpos=status.str.contains('MALATTIA_IN_CORSO')
+    #assert that there are no patients with covid still going
+    assert test_df[stillpos].empty
+    #assert that that the duplicates have been dropped
+    assert len(test_df.index)==3
+
+
+
 
 
 
