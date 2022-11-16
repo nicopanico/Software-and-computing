@@ -2,11 +2,10 @@
 
 
 import pandas as pd
-
-
+import datetime
 from scipy.stats import fisher_exact
 from Classes_for_user import names
-
+import numpy as np
 
 
 """
@@ -135,7 +134,7 @@ def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
     return(contingency,OR, p)
 
 
-def correct_dates(df):
+def correct_dates(df,date_column,month_col):
     """
     Function in order to reorder dates, sometimes dates are wrote in different formats (day-month or month-day) this function 
     put the in order year-month-day, the dataframe provided needs to contain dates in a datetime format!
@@ -145,6 +144,27 @@ def correct_dates(df):
         df==same dataframe but with corrected dates
     @Nicola2022
     """
+    #compare dates month with reference columns of month
+    end_dates_month=pd.DatetimeIndex(df[names.key_words.fine]).month
+    TrueMonthEnd=df['MESE_x']
+    compareEndMonth=end_dates_month==TrueMonthEnd
+    
+    #get the array of corrected months
+    TrueMonthEndIter=iter(TrueMonthEnd)
+    EndDatesMontIter=iter(end_dates_month)
+    correctedMonth=[next(TrueMonthEndIter) if x else next(end_dates_month) for x in compareEndMonth]
+    pd.DatetimeIndex(df[names.key_words.fine]).month=correctedMonth
+    
+    #compare end dates
+    
+    
+    
+    TrueMonthStartIter=iter(TrueMonthStart)
+    EndDatesMontIter=iter(end_dates_month)
+    correctedMonth=[next(TrueMonthStartIter) if x else next(end_dates_month) for x in compareEndMonth]
+    
+    ##this function can be made only one 
+    
     if not df.empty:
         for i in range(0, len(df.index)):
             if df.DATA_INIZIO.iloc[i].month!=df.MESE_y.iloc[i]: 
