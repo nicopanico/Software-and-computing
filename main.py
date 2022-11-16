@@ -23,7 +23,7 @@ list_cov_setting,list_setting_nocov,list_setting_cov_noint=pre_processing.settin
 dataset_bolo_exit_pos=pre_processing.create_dataset_exit(database_pos_outcome,data.ID_Bologna,data.analisi_uscite_updated)
 dataset_bolo_hospital_path_pos=pre_processing.create_dataset_hospital_path(dataset_bolo_exit_pos,data.analysis_entries_updated)
 df_pos_rec_KM=pre_processing.create_dataset_KM(dataset_bolo_hospital_path_pos,database_pos_outcome)
-sex_bolo=pre_processing.create_list_sex(data.anag_comune_bo)
+sex_bolo=pre_processing.create_df_sex(data.anag_comune_bo)
 ID_list=pre_processing.create_intensive_ID_list(dataset_bolo_hospital_path_pos)
                                                     
 
