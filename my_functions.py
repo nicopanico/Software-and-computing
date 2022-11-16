@@ -21,24 +21,22 @@ def create_target_ID_list(df, key_word, col_name):
  function in order to create a list containing the ID of all the patients with a certain resume
  inputs:
     df=dataset containing the data
-    key_word= word we would like to search in our dataset given as a string
+    key_word= word we would like to search in our dataset given as a string or also as a lsit of strings, e.g. if 
+    you want to serach for more settings you cant provide key_word=['sett1','sett2']...
     col_name=name of the column where we would like to search key_word given as a string
     @Nicola-2022
   
   '''
     if df.empty:
         target_list=[]
-    else:
-       if col_name  not in df.columns:
-           raise ValueError('{} is not in the dataframe columns'.format(col_name))
-       else:
-         target_list=[] #defining the list
-         for i in range(0,len(df.index)):              
-            if key_word in df[col_name].iloc[i]: #search if the key_word is in the column
-                       target_list.append(i)
-            else:
-                continue
-                          
+    if col_name  not in df.columns:
+        raise ValueError('{} is not in the dataframe columns'.format(col_name)) 
+        
+    col=df[col_name]
+    isKey=col.isin(key_word)
+    df_key=df[isKey]
+    target_list=list(df_key.index)
+
     return(target_list) 
   
  
@@ -56,12 +54,11 @@ def deceased_list(df):
     """
      if names.key_words.deceduto not in df.columns:
         raise ValueError('{} is not in the dataframe columns,take a dataset with deceased data'.format('DECEDUTO'))
-     else:
-       deceased_list=[]
-       for i in range(0, len(df.index)):
-           if df['DECEDUTO'].iloc[i]==1:
-                deceased_list.append(i)
-       return(deceased_list)
+     
+     isDead=df[names.key_words.deceduto].isin([1])
+     df_dead=df[isDead]
+     deceased_list=list(df_dead.index)
+     return(deceased_list)
    
 
 
@@ -78,73 +75,43 @@ def common_elements(list1, list2):
         if i in list2:
             list1.remove(i)
     return(list1)
-            
 
-
-def create_contingency_single(df,ptlg,key_word):
-    """
-    Function in order to get the lists to build a contingency table for a single key_word
-    Input:
-        df==dataframe to give as input to build the lists
-        ptlg==name of the patology to build the contingency lists
-        key_word==setting to take as reference to check the patology
-    Output:
-        ispat==list containing 'SI' for the aptient who have the patology 'NO' otherwise
-        isin==list containing 'SI' for the patients who are in the key_word setting 'NO' otherwise
-    @Nicola2022
-    """
-    if df.empty:
-        print("Can't get any List with an empty df")
-        return
-    else:
- 
-       ispat=[]
-       isint=[]
-   
-       for i in range(0, len(df.index)):
-            if ptlg in df[names.key_words.descrizione_esenzione].iloc[i]:
-                ispat.append('SI')
-            else:
-              ispat.append('NO')
-            if key_word in df[names.key_words.setting].iloc[i]:
-               isint.append('SI')
-            else:
-              isint.append('NO')
+             
        
-       return(ispat,isint)
 
-
-def create_contingency_multiple(df,ptlg,key_list):
+def create_contingency_pat(df,ptlg):
     """
-    Function in order to get the lists  to build a contingency table for a key_list
-    Input:
-        df==dataframe to give as input to build the lists
-        ptlg==name of the patology to build the contingency lists
-        key_list==settings to take as reference to check the patology (given as a list of strings saying all the setting where you would like to search the ptlg)
+    Function to create the contingency list with 'SI' or 'NO' base on if the patient has or not one of the patologies
+    in ptlg
+    Inputs:
+        df==df to give as input
+        ptlg== patology list containing all the wanted patologies
     Output:
-        ispat==list containing 'SI' for the aptient who have the patology 'NO' otherwise
-        isin==list containing 'SI' for the patients who are in the key_list settings 'NO' otherwise
+        ispat==list with the 'SI' or 'NO' values
     @Nicola2022
     """
-    if df.empty:
-        print("Can't get any List with an empty df")
-        return
-    else:
-      ispat=[]
-      isint=[]
-      for i in range(0, len(df)):
-                if ptlg in df[names.key_words.descrizione_esenzione].iloc[i]:
-                    ispat.append('SI')
-                else:
-                    ispat.append('NO')
-                found=False
-                for k in key_list:
-                    if k in df[names.key_words.setting].iloc[i] and not found:
-                        isint.append('SI')
-                        found=True
-                if not found:
-                    isint.append('NO')
-      return(ispat,isint)
+    patol=df[names.key_words.descrizione_esenzione]
+    isPtlg=list(patol.isin(ptlg))
+    ispat=['SI' if x else 'NO' for x in isPtlg]
+    return(ispat)
+
+
+def create_contingency_sett(df,key_word):
+    """
+    Function to create the contingency lsit with 'SI' or 'NO' based on if the patient is in the defined settings
+    Inputs:
+        df==df to give as input
+        key_word==list of settings to pass as input
+    Output:
+        isint=list with the 'SI' or 'NO' values
+    @Nicola2022
+    """
+    sett=df[names.key_words.setting]
+    isSett=list(sett.isin(key_word))
+    isint=['SI' if x else 'NO' for x  in isSett]
+    return(isint)
+
+
   
 
 def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
