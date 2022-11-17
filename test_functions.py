@@ -642,6 +642,7 @@ def test_contingency_datasets(df,settlist):
         df==input dataset to test
         settlist== list of setting to select patients
     Output:
+        df with the patients having only the selected settings, patients that in the tested case have OTHER have to be discarded
         
     """
 
@@ -655,8 +656,8 @@ def test_contingency_datasets(df,settlist):
             assert counts==df_counts, "Not the same values, you are missing some values"
             assert len(dataset_final.index)==df_counts
    
-    
-   
+#------------------------------------------------------------------------------   
+  
 @given(df=data_frames(columns=columns(["DATA_INIZIO","MESE_y","DATA_FINE","MESE_x"],dtype=str),
                          rows=st.tuples(
                              st.datetimes(min_value=datetime.datetime(2020, 1, 1), max_value=datetime.datetime(2020, 1, 12),allow_imaginary=False),
@@ -665,34 +666,30 @@ def test_contingency_datasets(df,settlist):
                              st.integers(min_value=1,max_value=12)
                              )))
 @settings(max_examples = 5)    
-
-def test_correct_dates(df):
+df_test=pd.DataFrame({'DATA_FINE':['2022-08-05','2022-05-11'],'MESE_x':[5,5]})
+date_col='DATA_FINE'
+month_col='MESE_x'
+def test_correct_dates(df=df_test,date_col=date_col,month_col=month_col):
+    """
+    Test that the fucntion is correctly changing the month with the day if they are swapped,
+    This test is to verify that the filter of the fucntion properly work, the dates are a priopri assumed
+    to be right so not in the form 2022-33-33 but day<32 and motnh <13,
+    the test dataset has a columns for the month the test works with dates that have day and month <12 so they can be easly
+    get swapped as a human error,
+    the first date provided should be swapped if the function works passing from 2022-08-05 to 2022-05-08
+    Inputs:
+        df==df with the dates to change
+        date_col==the columns where to operate the swap if necessary
+        month_col==co0lumns tracking the real month to take as a reference
+    Output:
+        df with the dates all coherent with their respective value in the columns
+        month_col
     
     """
-    Test that the fucntion correctly exchanges the moth with the day in case the corresponding value in the columns
-    mese doest not match with the motnh in the datetime
-    simple datframe given as input ,the test only assures that the switch is done properly under the fucntion conditions
-
-    """
-    if not df.empty:
-        months=[]
-        days=[]
-        for i in range(0,len(df.index)):
-            months.append(df.DATA_INIZIO.iloc[i].month)
-            days.append(df.DATA_INIZIO.iloc[i].day)
-            
-        df_corr=ff.correct_dates(df)
-        
-        months_corr=[]
-        days_corr=[]
-        for i in range(0,len(df_corr.index)):
-            months_corr.append(df_corr.DATA_INIZIO.iloc[i].month)
-            days_corr.append(df_corr.DATA_INIZIO.iloc[i].day)
-        
-        for i in range(0, len(df_corr.index)):
-            if df.DATA_INIZIO.iloc[i].month != df.MESE_y.iloc[i]:
-                assert months_corr[i]!=months[i]
-                assert days_corr[i] != days[i]
+    df['DATA_FINE']=pd.to_datetime(df['DATA_FINE']) #covert in datetime
+    ff.correct_dates(df,date_col,month_col)
+    assert df['DATA_FINE'].iloc[0].month==5
+    
             
         
         
