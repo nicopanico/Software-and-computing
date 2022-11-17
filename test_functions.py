@@ -53,27 +53,29 @@ def test_create_target_ID_list(df,key_word,col_name):
     elif key_word in set(df[key.setting]):
         assert len(test_list)==df[col_name].value_counts()[key_word], "expected the same number "
     
-
-   
+#------------------------------------------------------------------------------
+#TEST DECEASED LIST
+ 
 @given(df=data_frames(columns=columns(["DECEDUTO"],dtype=str),
                         rows=st.tuples(
                              st.integers(0,1))))
 @settings(max_examples = 5)
 def test_deceased_list(df):
     """
-    Test that given a dataset containing a deceased column the fucntion appends in the colums only the rows that have
-    1 as value for deceased
+    Test that given as test_df a df containing a columns of deceased with some deceased and some alive
+    the fucntion correctly selects only the deceased ones and put the in a list
     As input:
-        Dataframe with a deceased column
+        df==Dataframe with a deceased column
     As output:
-        list containing the row numbers of the deceased patients
+        isdead==list containing the row numbers of the deceased patients
     @Nicola2022
     """
     isdead=ff.deceased_list(df)
     assert len(isdead)==df.loc[df.DECEDUTO == 1, 'DECEDUTO'].count(), "expected the same number"
 
+#------------------------------------------------------------------------------
+#TEST THE FUCNTION common_elements
 
-     
 @given(list1=st.lists(st.integers()),
 list2=st.lists(st.integers()))
 @settings(max_examples = 5)
@@ -81,6 +83,13 @@ list2=st.lists(st.integers()))
 def test_common_elements(list1,list2):
     """
     test if the fucntion is correcting removing common elements of the 2 lists from list1
+    given 2 lists with common elements the resulting lsit 1 should be modified to have only inuque elements
+    so if the list share a value 2 the list 1 should have that value removed
+    Inputs:
+        list1==first list that will be uypdated
+        list2==list to comapre with list1
+    Output:
+        List1== has to have only values that does not belong to list 2, so unique
     @Nicola2022
     """   
     outputList=ff.common_elements(list1, list2)
@@ -89,83 +98,15 @@ def test_common_elements(list1,list2):
     set2=set(list2)
     assert any(x in set2  for x in outputList)==False, "expected the output list and the list2 to not share elements"
     
-        
-"""
-TESTS for the contingency tables functions
-"""
-@given(df=data_frames(columns=columns(["SETTING","Descrizione_Esenzione"],dtype=str),
-                         rows=st.tuples(
-                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)",fullmatch=True),
-                             st.from_regex("(DIABETE MELLITO|IPERTENSIONE)",fullmatch=True))),
-       key_word=st.from_regex("TERAPIA INTENSIVA COVID",fullmatch=True),ptlg=st.from_regex("IPERTENSIONE", fullmatch=True))    
-@settings(max_examples = 5)
+#------------------------------------------------------------------------------        
 
-def test_create_contingency_single(df,ptlg,key_word):
-    """
-    Test that, given a certain dataset with settings and patologies the fucntion is correcting creating the 2 lists with 'SI'
-    and 'NO' for the contingency tables
-    Inputs:
-       df== dataframe containing setting and patologies columns
-       ptlg== one random patology to test
-       key_list= list of settings to test the function
-    Notes:
-       providing empty df gives a message from the function itself
-   @Nicola2022
-    
-    """
-    
-    if not df.empty:
-        ispat,isint=ff.create_contingency_single(df,ptlg,key_word)
-        #normal assert on the setting
-        if key_word in set(df[key.setting]):
-            assert isint.count('SI')==df[key.setting].value_counts()[key_word]   
-        else:
-            assert isint.count('SI')==0
-        #asserts on the patient patology list
-        if ptlg in set(df[key.descrizione_esenzione]):
-            assert ispat.count('SI')==df[key.descrizione_esenzione].value_counts()[ptlg]
-        else:
-            assert ispat.count('SI')==0
             
         
        
  
     
-@given(df=data_frames(columns=columns(["SETTING","Descrizione_Esenzione"],dtype=str),
-                         rows=st.tuples(
-                             st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)|OTHER SETTING",fullmatch=True),
-                             st.from_regex("(DIABETE MELLITO|IPERTENSIONE)",fullmatch=True))),
-       key_list=st.lists(st.from_regex("TERAPIA INTENSIVA \ (COVID|NO COVID)",fullmatch=True),unique=True),ptlg=st.from_regex("IPERTENSIONE", fullmatch=True))    
-@settings(max_examples = 5)
-def test_create_contingency_multiple(df,ptlg,key_list):  
-    """
-Test that, given a certain dataset with settings and patologies the fucntion is correcting creating the 2 lists with 'SI'
-and 'NO' for the contingency tables
-Inputs:
-    df== dataframe containing setting and patologies columns
-    ptlg== one random patology to test
-    key_list= list of settings to test the function
-Notes:
-    providing empty df gives a message from the function itself
-@Nicola2022
 
 
-"""          
-    if not df.empty:
-        ispat,isint=ff.create_contingency_multiple(df,ptlg,key_list)
-        #normal assert on the settings
-        d=df.isin(key_list)
-        falsy_check=d['SETTING'].value_counts()[False]
-        if falsy_check==len(df.index):
-            assert isint.count('SI')==0
-        else:
-            occurencies=df['SETTING'].value_counts()
-            assert isint.count('SI')==occurencies[key_list].sum()
-        #asserts on the patient patology list
-        if ptlg in set(df[key.descrizione_esenzione]):
-            assert ispat.count('SI')==df[key.descrizione_esenzione].value_counts()[ptlg]
-        else:
-            assert ispat.count('SI')==0
     
     
 ##TESTS OF THE MODULE pre_processing.py
@@ -684,7 +625,7 @@ def test_correct_dates(df=df_test,date_col=date_col,month_col=month_col):
     Output:
         df with the dates all coherent with their respective value in the columns
         month_col
-    
+    @Nicola2022
     """
     df['DATA_FINE']=pd.to_datetime(df['DATA_FINE']) #covert in datetime
     ff.correct_dates(df,date_col,month_col)
