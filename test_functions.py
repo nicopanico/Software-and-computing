@@ -410,7 +410,42 @@ def test_create_dataset_KM2(df_path=df1,df_out=df2):
      test_df=pre_processing.create_dataset_KM(df_path,df_out)
      #assert that the patient with data_fine < data_accetaazione has been removed (ID_PER=2)
      assert len(test_df)==0
-         
+#------------------------------------------------------------------------------
+#COMPLETE TESTING OF THE FUNCTION TO CREATE THE KAPLAN-MEIER FINAL DATASET
+
+#test1
+df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+                  'DATA_ACCETTAZIONE'
+                  'ETA':[55,25]})
+def test_kaplan_meier_dataset(df,list_ID,list_sex):
+    """
+    Test1: Test that the fucntion correctly makes the distintion bewteeen patients from covid intensive care and
+    patients that are not
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=sex of the pa<tients
+    Output:
+        df has to assign correctly the patient that is in intensive care a value=1 and has to assign him the right time
+        so the expected result is to have one patient with time=total hospitalization time and the other with time= time to go in covid intensive care
+    @Nicola2022
+    """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
 #test the functtion create_list_sex
 
 @given(df=data_frames(columns=columns(["ID_PER",'PER_KEY_SESSO','SETTING'],dtype=str),

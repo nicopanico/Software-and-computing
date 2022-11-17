@@ -11,7 +11,14 @@ def calculate_timediff_days(date1,date2):
 
 def kaplan_meier_dataset(df,list_ID,sex_bolo):
     """
-    
+    Fucntion to create the final df for KM
+    Inputs:
+        df==df as input where there are all the resume for the ID with their hospitalization details (dates, covid status...)
+        list_ID==list of ID that are in intensive care
+        sex_bolo=list of all the sex for ID
+    Output:
+        keplan_meier_db==dataset containing ID of patients, days of hospitalization or days before going into covids intensive care
+        sex and a binary columns with 1 if in intensive care 0 else and a columns with the age
     @Nicola2022
     """
 
