@@ -21,7 +21,7 @@ def create_target_ID_list(df, key_word, col_name):
  inputs:
     df=dataset containing the data
     key_word= word we would like to search in our dataset given as a string or also as a lsit of strings, e.g. if 
-    you want to serach for more settings you cant provide key_word=['sett1','sett2']...
+    you want to search for more settings you cant provide key_word=['sett1','sett2']...
     col_name=name of the column where we would like to search key_word given as a string
     @Nicola-2022
   

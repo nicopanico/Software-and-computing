@@ -23,7 +23,8 @@ from Classes_for_user.init_data import covid_data as data
 
 
 
-
+#------------------------------------------------------------------------------
+#PRE PROCESSING OF THE DATA FOR CONTINGENCIES
 
 def create_data_patologies(df_pat, df_ID):
     """
@@ -181,7 +182,8 @@ def create_intensive_ID_list(df_path):
 
 #------------------------------------------------------------------------------
 
-# # Contingency tables of positive Bologna IDs
+# # CONTINGENCY TABLES DATASETS
+
 def setting_lists():
     """
     define the settings lists from the classes
@@ -207,6 +209,9 @@ def create_list_multiple_sett(df,target_list):
     if type(target_list)==str:
         target_list=[target_list]
     
+    
+    
+    
     isPosnotcovint=[]
     for i in range(0, len(target_list)):
         list_pat=ff.create_target_ID_list(df,target_list[i],key.setting)
@@ -228,17 +233,15 @@ def contingency_datasets(df,settlist,sub_list=[]):
     """
     if type(settlist)==str:
       settlist=[settlist]  
-    if df.empty:
-        print("The input dataframe is empty, no operation performed")
-        return
+   
    
     settlist_complete=settlist
     settlist_complete.append('NaN')#to consider the non hospitalized ones
-    isPosnotcovint=create_list_multiple_sett(df,settlist_complete)
+    isPosnotcovint=ff.create_target_ID_list(df,settlist_complete,key.setting)
     if not sub_list:
         dataset_final=df[df.index.isin(isPosnotcovint)]
         
-    isPosInt=create_list_multiple_sett(df, sub_list)
+    isPosInt=ff.create_target_ID_list(df,sub_list,key.setting)
     #now remove the patients that have been hospitalized also in setting unwanted
     isPosnotcovint=ff.common_elements(isPosnotcovint,isPosInt)
     #also obtain a dataset with intensive care patients but not the other covid settings, that will be usefull for the cntingency tables
