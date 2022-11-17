@@ -4,7 +4,7 @@ from lifelines import KaplanMeierFitter
 import matplotlib.pyplot as plt
 
 def calculate_timediff_days(date1,date2):
-    day_diff=(date1-date2.total_seconds())/86400
+    day_diff=((date1-date2).total_seconds())/86400
     return(day_diff)
     
 
@@ -34,16 +34,16 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
                     tempID=df['ID_PER'].iloc[i]
                     
                     if 'TERAPIA INTENSIVA COVID' not in df['SETTING'].iloc[i]:
-                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA_x.iloc[i],'Intensiva':0},ignore_index=True)
+                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i], df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA.iloc[i],'Intensiva':0},ignore_index=True)
                         wasintcovid=False
                         #print(tempID)   
                     else:
-                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA_.iloc[i],'Intensiva':0},ignore_index=True)
+                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i], df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA.iloc[i],'Intensiva':0},ignore_index=True)
                         wasintcovid=True    
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' not in df['SETTING'].iloc[i] and not wasintcovid:
                     if tempdate<df.DATA_FINE.iloc[i]:
                         tempdate=df.DATA_FINE.iloc[i]
-                        keplan_meier_db['Giorni'].iloc[-1]=calculate_timediff_days(tempdate-df.DATA_ACCETTAZIONE.iloc[i])       
+                        keplan_meier_db['Giorni'].iloc[-1]=calculate_timediff_days(tempdate, df.DATA_ACCETTAZIONE.iloc[i])       
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' in df['SETTING'].iloc[i]:
                     wasintcovid=True
                 

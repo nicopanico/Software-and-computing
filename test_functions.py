@@ -9,6 +9,8 @@ from hypothesis.extra.pandas import data_frames, columns
 from Classes_for_user.names import key_words as key
 from script_modules.pre_processing import contingency_datasets as cntg_dt
 from script_modules import pre_processing
+from script_modules import Kaplan_Meier
+
 import datetime
 import pandas as pd
 
@@ -415,37 +417,159 @@ def test_create_dataset_KM2(df_path=df1,df_out=df2):
 
 #test1
 df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
-                  'DATA_ACCETTAZIONE'
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
                   'ETA':[55,25]})
-def test_kaplan_meier_dataset(df,list_ID,list_sex):
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','M'],'ID_PER':[1,2]})
+
+def test_kaplan_meier_dataset(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
     """
     Test1: Test that the fucntion correctly makes the distintion bewteeen patients from covid intensive care and
     patients that are not
     Inputs:
         df==df containing 1 normal patient and one patient from intensive care with dates
         list_ID==ID of the patients in intensive care
-        sex_bolo=sex of the pa<tients
+        sex_bolo=df with the IDs of Bologna and their sex
     Output:
-        df has to assign correctly the patient that is in intensive care a value=1 and has to assign him the right time
-        so the expected result is to have one patient with time=total hospitalization time and the other with time= time to go in covid intensive care
+        df has to assign correctly the patient that is in intensive care a value=1 
     @Nicola2022
     """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has a 1 in the intensive care column to make sure the fucntion assign it correctly
+    assert test_df['Intensiva'].iloc[1]==1
+    
+#test 2
+    
+df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
+                  'ETA':[55,25]})
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','M'],'ID_PER':[1,2]})
+
+def test_kaplan_meier_dataset2(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
+    """
+    Test2: Test that the fucntion correctly makes the distintion bewteeen patients from covid intensive care and
+    patients that are not, in the case of which the patients starts directly with intensive care the time is counted as all the time
+    that the patient passed in covid intensive care
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=df with the IDs of Bologna and their sex
+    Output:
+        df has to assign correctly the patient that is in intensive care the right time
+        so the expected result is to have one patient with time=total hospitalization time and the other with time= time to go in covid intensive care
+        The first patient has been preovided with a time of 3 days the second in intensive care with a time of 7 days
+        those times have to be tested to be right in the final df
+    @Nicola2022
+    """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has the right days in the columns and also patient ID=1
+    assert test_df['Giorni'].iloc[0]==3
+    assert test_df['Giorni'].iloc[1]==7
+
+#test 3
+df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID','sett2','sett3'],
+                  'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
+                  'ETA':[55,25,25,25]})
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','M'],'ID_PER':[1,2]})  
+
+def test_kaplan_meier_dataset3(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
+    """
+    Test3: Test that the fucntiopn correctly points the patients in intensive care and if the patient in intensive care gets provided with other settings after
+    intensive care the fucntion does not have to take the other settings after intensive care into account
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=df with the IDs of Bologna and their sex
+    Output:
+        df has to be se right value of days for patient with ID=2, because the patient has hospitlaization after covid intensive
+        care, but the fucntion has to stop counting the days at the time which the patient enters intensive care
+        so the expected time in days has to remain 7
+    @Nicola2022
+    """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has still 7 days in intensive care
+    assert test_df['Giorni'].iloc[1]==7
+   
+#test 4
+df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['sett1','sett2','sett3','TERAPIA INTENSIVA COVID'],
+                  'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
+                  'ETA':[55,25,25,25]})
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','M'],'ID_PER':[1,2]})  
+
+def test_kaplan_meier_dataset4(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
+    """
+    Test4: Test that the fucntiopn correctly points the patients in intensive care, in the case which the intensive care covid is 
+    in the middle of other settings, the fucntions has to take into account all the time before intensive care, and not intenive
+    care time, so it has to stop as TERAPIA INTENSIVA COVID
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=df with the IDs of Bologna and their sex
+    Output:
+        df has to have the days sum which is the sum of all the settings before covid intensive care and exluding the settings after
+        in the test provided the expected value for Giorni=14
+    @Nicola2022
+    """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has the right number of days (14) before going to covid intensive care
+    assert test_df['Giorni'].iloc[1]==14
+    
+
+#test5
+df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['TERAPIA INTENSIVA COVID','sett2','sett3','sett5'],
+                  'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
+                  'ETA':[55,25,25,25]})
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','M'],'ID_PER':[1,2]})  
+
+def test_kaplan_meier_dataset5(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
+    """
+    Test5: test that in case of non covid intensive care the fucntion sums all the days of hospitalization from the first
+    setting to the last one for the patients
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=df with the IDs of Bologna and their sex
+    Output:
+        df with the right sum of all the hospitalization days
+    @Nicola2022
+    """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has 21 days of hospitalization as set in the df1 test
+    assert test_df['Giorni'].iloc[1]==21
 
 
+#test 6
+df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+                  'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
+                  'ETA':[55,25]})
+list_ID_test=[2]
+sex_bolo_test=pd.DataFrame({'PER_KEY_SESSO':['M','F'],'ID_PER':[1,2]})   
+def test_kaplan_meier_dataset6(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test):
+    """
+    Test6: Test that the fucntions assigns the correct binary values for the sex (gender) as 0 for Female and 1 for Male
+    the fucntion has been tested with a df containing 1 female and 1 male
+    Inputs:
+        df==df containing 1 normal patient and one patient from intensive care with dates
+        list_ID==ID of the patients in intensive care
+        sex_bolo=df with the IDs of Bologna and their sex
+    Output:
+        df with the right values for sex ID=1 has to have 1 and ID=2 has to have 0
+    @Nicola2022
+    """
+    test_df=Kaplan_Meier.kaplan_meier_dataset(df,list_ID,list_sex)
+    #assert that patient with ID=2 has 21 days of hospitalization as set in the df1 test
+    assert test_df['sesso'].iloc[0]==1
+    assert test_df['sesso'].iloc[1]==0
 
 
-
-
-
-
-
-
-
-
-
-
-
-       
+#------------------------------------------------------------------------------      
 #test the functtion create_list_sex
 
 @given(df=data_frames(columns=columns(["ID_PER",'PER_KEY_SESSO','SETTING'],dtype=str),
@@ -470,7 +594,9 @@ def test_create_df_sex(df):
     test_df=pre_processing.create_df_sex(df)
     assert len(test_df)==len(df)
     assert 'SETTING' not in test_df
-
+    
+    
+#------------------------------------------------------------------------------
 #test the function create_intensive_ID_list
 df1=pd.DataFrame({'ID_PER':[1,2,3,4],'SETTING':['TERAPIA INTENSIVA COVID','sett1','TERAPIA INTENSIVA COVID','sett2']})
 def test_create_intensive_ID_list(df_path=df1):
@@ -492,7 +618,7 @@ def test_create_intensive_ID_list(df_path=df1):
     #assert it to be TERAPIA INTENSIVA COVID
     assert checkSett=='TERAPIA INTENSIVA COVID'
     
-    
+#------------------------------------------------------------------------------
    
 
 
@@ -506,6 +632,20 @@ def test_create_intensive_ID_list(df_path=df1):
                              )),settlist=st.lists(st.from_regex("TERAPIA INTENSIVA \ (COVID|NO COVID)",fullmatch=True),min_size=1,unique=True))
 @settings(max_examples = 5)      
 def test_contingency_datasets(df,settlist):
+    """
+    test that the function correctly gives the df with settings and patologies for all the patients with a specific setting
+    the fucntion has been tested with a random df containing 3 possible settings and a setting list to select only patients 
+    who have settings coming from that list,
+    in the test a sett list containing TERAPIA INTENSIVA COVID or TERAPIA INTENSIVA NO COVID has been provided,
+    the test have to assure all the apteints in the databse have only those settings
+    Inputs:
+        df==input dataset to test
+        settlist== list of setting to select patients
+    Output:
+        
+    """
+
+    
     if not df.empty:
         dataset_final=cntg_dt(df,settlist)
         if not dataset_final.empty:
