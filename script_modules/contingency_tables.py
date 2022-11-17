@@ -15,7 +15,7 @@ def define_contingency_table_single(df, sett,table_name,patology=trial_list):
     """
     function to create contingencies and to append OR and p-value for all the patologies
     using the already tested fucntions for contingency (for a single setting)
-    Input:
+    Inputs:
         df==dataframe already prepared for contingency
         sett==list containing the setting where you want to build the contingencies
         table_name==string variable to give a name to table column
@@ -38,7 +38,7 @@ def define_contingency_table_multiple(df, sett_list,table_name,patology=trial_li
     """
     function to create contingencies and to append OR and p-value for all the patologies
     using the already tested fucntions for contingency (for a list of settings)
-    Input:
+    Inputs:
         df==dataframe already prepared for contingency
         sett_list==list containing the setting where you want to build the contingencies
         table_name==string variable to give a name to table column
@@ -74,4 +74,4 @@ def show_contingency_results(list1,list2,list3):
     OD_compare=pd.DataFrame.from_dict([list1,list2,list3])
     OD_compare=OD_compare.rename(index={0:'setting no covid',2:'covid intensive care',1:'covid settings no int'})
     return(OD_compare)
-    print(OD_compare)
+ 

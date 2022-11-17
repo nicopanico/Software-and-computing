@@ -137,7 +137,9 @@ def create_dataset_KM(df_path,df_out):
         df_pos_rec_KM==final dataset with corrected patients with a CLEAR hospital path
     @Nicola2022
     """
-    df_path=ff.correct_dates(df_path) #first correct dates
+    ff.correct_dates(df_path,key.fine,'MESE_x') #first correct dates end
+    ff.correct_dates(df_path,key.inizio,'MESE_y') #first correct dates start
+
     
     df_pos_rec=pd.merge(df_path[['ID_PER','SETTING','DATA_INIZIO','DATA_FINE','ID_RICOVERO','DURATA_GG','ETA_x']],
                         df_out[['ID_PER','DATA_ESITO','DATA_ACCETTAZIONE']],how='left', on=['ID_PER'])
@@ -147,6 +149,7 @@ def create_dataset_KM(df_path,df_out):
     DiffDateBool=DateAcc>DateEnd
     #rename the column ETA_x as simply ETA to define the age of the patients
     df_pos_rec_KM=df_pos_rec[~DiffDateBool]
+    df_pos_rec_KM=df_pos_rec_KM.rename(columns={"ETA_x":"ETA" })
     return(df_pos_rec_KM)
 
 
@@ -194,30 +197,6 @@ def setting_lists():
     #all the non covid settings
     list_setting_cov_noint=(settlist.covid_setting_no_int)
     return(list_cov_setting,list_setting_nocov,list_setting_cov_noint)
-
-
-def create_list_multiple_sett(df,target_list):
-    """
-    create a lsit containin the ID of patients that are in the list of settings
-    Inputs:
-        df==dataset where to take patients
-        target_list==list of setting to check
-    Output:
-        complete list of all the patients that are in that setting
-    @Nicola2022
-    """
-    if type(target_list)==str:
-        target_list=[target_list]
-    
-    
-    
-    
-    isPosnotcovint=[]
-    for i in range(0, len(target_list)):
-        list_pat=ff.create_target_ID_list(df,target_list[i],key.setting)
-        isPosnotcovint=list(set().union(list_pat,isPosnotcovint))
-    return(isPosnotcovint)
-    
 
 
 def contingency_datasets(df,settlist,sub_list=[]):

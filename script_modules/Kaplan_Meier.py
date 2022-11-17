@@ -3,14 +3,15 @@ import pandas as pd
 from lifelines import KaplanMeierFitter
 import matplotlib.pyplot as plt
 
-
+def calculate_timediff_days(date1,date2):
+    day_diff=(date1-date2.total_seconds())/86400
+    return(day_diff)
+    
 
 
 def kaplan_meier_dataset(df,list_ID,sex_bolo):
     """
-    fucntion to define the dataset to use in the kaplan-meier analisys, the only difference is that it takes into account patients
-    from their entry since their arrive in the covid intensive care or exit from hospital
-    then rename some columsn and assign binary values to sex and intensive care covid
+    
     @Nicola2022
     """
 
@@ -26,16 +27,16 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
                     tempID=df['ID_PER'].iloc[i]
                     
                     if 'TERAPIA INTENSIVA COVID' not in df['SETTING'].iloc[i]:
-                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': ((df.DATA_FINE.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]).total_seconds())/86400,'Età':df.ETA.iloc[i],'Intensiva':0},ignore_index=True)
+                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA_x.iloc[i],'Intensiva':0},ignore_index=True)
                         wasintcovid=False
                         #print(tempID)   
                     else:
-                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': ((df.DATA_INIZIO.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]).total_seconds())/86400,'Età':df.ETA.iloc[i],'Intensiva':0},ignore_index=True)
+                        keplan_meier_db=keplan_meier_db.append({'ID_PER':df.ID_PER.iloc[i],'Giorni': calculate_timediff_days(df.DATA_FINE.iloc[i]-df.DATA_ACCETTAZIONE.iloc[i]),'Età':df.ETA_.iloc[i],'Intensiva':0},ignore_index=True)
                         wasintcovid=True    
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' not in df['SETTING'].iloc[i] and not wasintcovid:
                     if tempdate<df.DATA_FINE.iloc[i]:
                         tempdate=df.DATA_FINE.iloc[i]
-                        keplan_meier_db['Giorni'].iloc[-1]=((tempdate-df.DATA_ACCETTAZIONE.iloc[i]).total_seconds())/86400        
+                        keplan_meier_db['Giorni'].iloc[-1]=calculate_timediff_days(tempdate-df.DATA_ACCETTAZIONE.iloc[i])       
             elif tempID==df['ID_PER'].iloc[i] and 'TERAPIA INTENSIVA COVID' in df['SETTING'].iloc[i]:
                     wasintcovid=True
                 
@@ -59,11 +60,11 @@ def kfm_fitter(df):
     """
     kfm=KaplanMeierFitter()
     kfm.fit(durations=df['Giorni'], event_observed=df['Intensiva'])
-    print(kfm.event_table)
     return(kfm)
 
 
-
+#------------------------------------------------------------------------------
+#PLOT FUNCTIONS FOR THE KM FITS
 def show_plots_kfm(kfm):
     """
     Fucntion to plot the 2 curves for the fitter

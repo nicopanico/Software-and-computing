@@ -1,11 +1,11 @@
-y# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 
 import pandas as pd
 import datetime
 from scipy.stats import fisher_exact
 from Classes_for_user import names
-import numpy as np
+
 
 
 """
@@ -17,12 +17,14 @@ scripts of the repository
     
 def create_target_ID_list(df, key_word, col_name):
     '''
- function in order to create a list containing the ID of all the patients with a certain resume
- inputs:
-    df=dataset containing the data
-    key_word= word we would like to search in our dataset given as a string or also as a lsit of strings, e.g. if 
-    you want to search for more settings you cant provide key_word=['sett1','sett2']...
-    col_name=name of the column where we would like to search key_word given as a string
+     function in order to create a list containing the ID of all the patients with a certain resume
+     Inputs:
+        df=dataset containing the data
+        key_word= word we would like to search in our dataset given as a string or also as a lsit of strings, e.g. if 
+        you want to search for more settings you cant provide key_word=['sett1','sett2']...
+        col_name=name of the column where we would like to search key_word given as a string
+    Output:
+        target_list==containing all the patients that have the serached key_words in the columns
     @Nicola-2022
   
   '''
@@ -43,9 +45,9 @@ def create_target_ID_list(df, key_word, col_name):
 def deceased_list(df):
      """
      Function in order to count the number of deceased patients in a certain dataframe
-     inputs:
+     Inputs:
          df==dataframe where to count the deceased patients
-     output:
+     Output:
          deceased_list==list containing the rows of patients thaat are deceased
     notes: the df provided has to containg a columns regarding the deceased patients otherwise the fucntion 
     will return an error
@@ -65,9 +67,11 @@ def deceased_list(df):
 def common_elements(list1, list2):
     """
     function in order to remove from one the common elements of the other
-    inputs:
+    Inputs:
         a==main list to remove elements from
         b==second list to comapre with a
+    Output:
+        list1== list1 with common elelenmts removed, be carefull becase the roginal lsit gets modified using the function!!!
     @Nicola-2022
     """
     for i in list1[:]:
@@ -146,18 +150,20 @@ def correct_dates(df,date_column,month_col):
         month_col==columns containing the info regarding the month
     Output:
         Same df but with modified dates in the wanted column
+    @Nicola2022
     """
     #compare dates month with reference columns of month
-    end_dates_month=pd.DatetimeIndex(df[names.key_words.fine]).month
-    TrueMonthEnd=df['MESE_x']
+    end_dates_month=pd.DatetimeIndex(df[date_column]).month
+    TrueMonthEnd=df[month_col]
     compareEndMonth=end_dates_month==TrueMonthEnd
     i=0
     for x in compareEndMonth:
         if not x:
-            day=df['DATA_FINE'].iloc[i].day
-            month=df['DATA_FINE'].iloc[i].month
-            df['DATA_FINE'].iloc[i]=df['DATA_FINE'].iloc[i].replace(month=day, day=month)
+            day=df[date_column].iloc[i].day
+            month=df[date_column].iloc[i].month
+            df[date_column].iloc[i]=df[date_column].iloc[i].replace(month=day, day=month)
         i=i+1
+    
            
     
 
