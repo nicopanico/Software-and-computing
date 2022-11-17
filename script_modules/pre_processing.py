@@ -65,7 +65,7 @@ def create_pos_outcome(df_pos):
         database_pos_outcome==df with the positive patients
     @Nicola2022
     """
-    iscovidnow=ff.create_target_ID_list(df_pos,key.malattia,key.esito)
+    iscovidnow=ff.create_target_ID_list(df_pos,[key.malattia],key.esito)
     database_pos_outcome=df_pos.drop(iscovidnow)#drop patients who still have covid
     database_pos_outcome.drop_duplicates(subset=[key.ID], inplace=True)#and remove the duplciates ID
     return (database_pos_outcome)

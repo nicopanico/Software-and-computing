@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+y# -*- coding: utf-8 -*-
 
 
 import pandas as pd
@@ -133,52 +133,34 @@ def build_contingency(ispat,isint,ptlg='patology',setting='setting'):
     OR, p=fisher_exact(contingency)
     return(contingency,OR, p)
 
-
 def correct_dates(df,date_column,month_col):
     """
-    Function in order to reorder dates, sometimes dates are wrote in different formats (day-month or month-day) this function 
-    put the in order year-month-day, the dataframe provided needs to contain dates in a datetime format!
-    Input:
-        df==datafram with the dates to be corrected
+    Function to reorder the dates ina  certain columns taking a value as refenrence for the month,
+    If you have a complex dataset with a columns of months and a columns of dates which months are not corresponding
+    this fucntion look at those dates and invert days with months,
+    The dates are assured to be right...for for example not haveing dates like 2022-44-44 or day greaterr than 31 and months greater
+    than 12
+    Inputs:
+        df== df where to take dates and columns
+        date_columns== columns containing the complete dates
+        month_col==columns containing the info regarding the month
     Output:
-        df==same dataframe but with corrected dates
-    @Nicola2022
+        Same df but with modified dates in the wanted column
     """
     #compare dates month with reference columns of month
     end_dates_month=pd.DatetimeIndex(df[names.key_words.fine]).month
     TrueMonthEnd=df['MESE_x']
     compareEndMonth=end_dates_month==TrueMonthEnd
+    i=0
+    for x in compareEndMonth:
+        if not x:
+            day=df['DATA_FINE'].iloc[i].day
+            month=df['DATA_FINE'].iloc[i].month
+            df['DATA_FINE'].iloc[i]=df['DATA_FINE'].iloc[i].replace(month=day, day=month)
+        i=i+1
+           
     
-    #get the array of corrected months
-    TrueMonthEndIter=iter(TrueMonthEnd)
-    EndDatesMontIter=iter(end_dates_month)
-    correctedMonth=[next(TrueMonthEndIter) if x else next(end_dates_month) for x in compareEndMonth]
-    pd.DatetimeIndex(df[names.key_words.fine]).month=correctedMonth
-    
-    #compare end dates
-    
-    
-    
-    TrueMonthStartIter=iter(TrueMonthStart)
-    EndDatesMontIter=iter(end_dates_month)
-    correctedMonth=[next(TrueMonthStartIter) if x else next(end_dates_month) for x in compareEndMonth]
-    
-    ##this function can be made only one 
-    
-    if not df.empty:
-        for i in range(0, len(df.index)):
-            if df.DATA_INIZIO.iloc[i].month!=df.MESE_y.iloc[i]: 
-                month_start=df.DATA_INIZIO.iloc[i].month
-                day_start=df.DATA_INIZIO.iloc[i].day
-                df.DATA_INIZIO.iloc[i]=df[names.key_words.inizio].iloc[i].replace(month=day_start,day=month_start)
-            if df.DATA_FINE.iloc[i].month!=df.MESE_x.iloc[i]: 
-                month_end=df.DATA_FINE.iloc[i].month
-                day_end=df.DATA_FINE.iloc[i].day
-                df.DATA_FINE.iloc[i]=df[names.key_words.fine].iloc[i].replace(month=day_end,day=month_end)
-        return(df)
-    else:
-        print("an empty dataset has been provided")
-        return
+
 
     
     
