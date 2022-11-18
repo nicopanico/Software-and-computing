@@ -14,8 +14,53 @@ from script_modules import Kaplan_Meier
 import datetime
 import pandas as pd
 
-##TESTS OF THE MODULE my_fucntions.py
+#------------------------------------------------------------------------------
+#TEST OF create_target_ID_list
 
+
+
+#test 1
+df1=pd.DataFrame({'ID_PER':[1,2,3,4,5],'SETTING':['sett1','sett2','sett2','sett2','sett4']})
+def test_create_target_ID_list(df=df1):
+    """
+    Test1: test that the function correctly creates the list of patients who have a certain value in a certain column,
+    this first test is to make sure that giving a SETTING column and a key_word ='sett2' the fucntion correctly 
+    append all the IDs that have 'sett2' in the setting columns
+    note: the fucntion takes key_word as a list so in case of a key_word of one string word, convert it into a one element
+    list
+    Inputs:
+        df==df with IDs and SETTING where to search for key_word
+    Output:
+        output list has to have only the patients that have 'sett2' in their setting columns
+        for the test, the fucntion works if indeces of pat with ID 2,3,4 are in the final list so (1,2,3)
+        and the list has the length equal to 3
+    """
+    col_name='SETTING'
+    key_word='sett2'
+    test_list=ff.create_target_ID_list(df,[key_word],col_name)
+    assert len(test_list)==3
+    assert list(test_list)==[1,2,3]
+
+#test2
+df1=pd.DataFrame({'ID_PER':[1,2,3,4,5],'SETTING':['sett1','sett2','sett3','sett4','sett5']})
+def test_create_target_ID_list(df=df1):
+    """
+    Test2: test that if a df without any of the serached values in the column col_names is taken the output lsit is empty
+    note: the fucntion takes key_word as a list so in case of a key_word of one string word, convert it into a one element
+    list
+    Inputs:
+        df==df with IDs and SETTING where to search for key_word
+    Output:
+        The output list has to havve 0 elements in this case since the key_word is not present in the column of the df
+    """
+    col_name='SETTING'
+    key_word='sett6'
+    test_list=ff.create_target_ID_list(df,[key_word],col_name)
+    assert not test_list
+    
+#test 3
+    
+    
 @given(df=data_frames(columns=columns(["SETTING","ID"],dtype=str),
                          rows=st.tuples(
                              st.from_regex("TERAPIA INTENSIVA\ (COVID|NO COVID)",fullmatch=True),
