@@ -179,7 +179,7 @@ def create_intensive_ID_list(df_path):
     # Restricting the analysis to all the hospitalized patients who had covid ongoing
     isIntCovid=df_path['SETTING'].isin(['TERAPIA INTENSIVA COVID'])
     df_int_covid=df_path[isIntCovid]
-    ID_list=list(df_int_covid['ID_PER'])
+    ID_list=list(df_int_covid['ID_RICOVERO'])
     return(ID_list)
 
 

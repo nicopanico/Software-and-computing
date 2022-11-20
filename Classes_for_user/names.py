@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 """
 Dataclass to define all the names used for the dataset columns
+@Nicola2022
 
 """
 @dataclass(frozen=True)

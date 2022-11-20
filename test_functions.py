@@ -34,10 +34,11 @@ def test_create_target_ID_list(df=df1):
         output list has to have only the patients that have 'sett2' in their setting columns
         for the test, the fucntion works if indeces of pat with ID 2,3,4 are in the final list so (1,2,3)
         and the list has the length equal to 3
+    @Nicola2022
     """
     col_name='SETTING'
-    key_word='sett2'
-    test_list=ff.create_target_ID_list(df,[key_word],col_name)
+    key_word=['sett2']
+    test_list=ff.create_target_ID_list(df,key_word,col_name)
     assert len(test_list)==3
     assert list(test_list)==[1,2,3]
 
@@ -52,13 +53,31 @@ def test_create_target_ID_list(df=df1):
         df==df with IDs and SETTING where to search for key_word
     Output:
         The output list has to havve 0 elements in this case since the key_word is not present in the column of the df
+    @Nicola2022
     """
     col_name='SETTING'
-    key_word='sett6'
-    test_list=ff.create_target_ID_list(df,[key_word],col_name)
+    key_word=['sett6']
+    test_list=ff.create_target_ID_list(df,key_word,col_name)
     assert not test_list
     
 #test 3
+df1=pd.DataFrame({'ID_PER':[1,2,3,4,5],'SETTING':['sett1','sett2','sett3','sett4','sett5']})
+def test_create_target_ID_list(df=df1):
+    """
+    Test3: Test that the function work also if a list of setting is passed as input, taking a dataset with varius IDs and their setting search for sett2 ad sett3 and 
+    append them, instead of a single setting
+    Inputs:
+        df==df with IDs and SETTING where to search for key_word
+    Output:
+        The output list has to havve number of elements corresponding to the IDs that have the sett in the key_word list
+        and also the value appended in the list have to be the right indices for the ID
+    @Nicola2022
+    
+    """
+    col_name='SETTING'
+    key_word=['sett1','sett2'] #define the list of settings 
+    test_list=ff.create_target_ID_list(df,key_word,col_name)
+    assert test_list==[0,1]
     
     
 @given(df=data_frames(columns=columns(["SETTING","ID"],dtype=str),
@@ -402,7 +421,7 @@ def test_create_dataset_KM2(df_path=df1,df_out=df2):
 #COMPLETE TESTING OF THE FUNCTION TO CREATE THE KAPLAN-MEIER FINAL DATASET
 
 #test1
-df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
                   'ETA':[55,25]})
 list_ID_test=[2]
@@ -426,7 +445,7 @@ def test_kaplan_meier_dataset(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_test
     
 #test 2
     
-df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
                   'ETA':[55,25]})
 list_ID_test=[2]
@@ -454,7 +473,7 @@ def test_kaplan_meier_dataset2(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_tes
     assert test_df['Giorni'].iloc[1]==7
 
 #test 3
-df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID','sett2','sett3'],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2,2,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID','sett2','sett3'],
                   'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
                   'ETA':[55,25,25,25]})
@@ -480,7 +499,7 @@ def test_kaplan_meier_dataset3(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_tes
     assert test_df['Giorni'].iloc[1]==7
    
 #test 4
-df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['sett1','sett2','sett3','TERAPIA INTENSIVA COVID'],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2,2,2],'SETTING':['sett1','sett2','sett3','TERAPIA INTENSIVA COVID'],
                   'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
                   'ETA':[55,25,25,25]})
@@ -507,7 +526,7 @@ def test_kaplan_meier_dataset4(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_tes
     
 
 #test5
-df1=pd.DataFrame({'ID_PER':[1,2,2,2],'SETTING':['TERAPIA INTENSIVA COVID','sett2','sett3','sett5'],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2,2,2],'SETTING':['TERAPIA INTENSIVA COVID','sett2','sett3','sett5'],
                   'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22),datetime.datetime(2022, 6, 1),datetime.datetime(2022, 6, 23)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15),datetime.datetime(2022, 5, 18),datetime.datetime(2022, 6, 2)],
                   'ETA':[55,25,25,25]})
@@ -532,7 +551,7 @@ def test_kaplan_meier_dataset5(df=df1,list_ID=list_ID_test,list_sex=sex_bolo_tes
 
 
 #test 6
-df1=pd.DataFrame({'ID_PER':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
+df1=pd.DataFrame({'ID_RICOVERO':[1,2],'SETTING':['sett1','TERAPIA INTENSIVA COVID'],'DATA_FINE':[datetime.datetime(2022, 5, 5),datetime.datetime(2022, 5, 22)],
                   'DATA_ACCETTAZIONE':[datetime.datetime(2022, 5, 2),datetime.datetime(2022, 5, 15)],
                   'ETA':[55,25]})
 list_ID_test=[2]
@@ -584,7 +603,7 @@ def test_create_df_sex(df):
     
 #------------------------------------------------------------------------------
 #test the function create_intensive_ID_list
-df1=pd.DataFrame({'ID_PER':[1,2,3,4],'SETTING':['TERAPIA INTENSIVA COVID','sett1','TERAPIA INTENSIVA COVID','sett2']})
+df1=pd.DataFrame({'ID_RICOVERO':[1,2,3,4],'SETTING':['TERAPIA INTENSIVA COVID','sett1','TERAPIA INTENSIVA COVID','sett2']})
 def test_create_intensive_ID_list(df_path=df1):
     """
     Testing that the function is correcting taking the IDs from covid intensive care and putting them in a list

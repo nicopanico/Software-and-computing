@@ -3,7 +3,10 @@
 
 import pandas as pd
 from Classes_for_user.names import key_words as key
-
+"""
+  Dataclass to import all the data usefull for the analysis
+  @Nicola2022
+"""
 
 class covid_data:
     anag_comune_bo=pd.read_csv('./Data_set/ANAGCOMUNEBO.csv')

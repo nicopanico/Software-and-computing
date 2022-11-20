@@ -21,29 +21,31 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
         sex and a binary columns with 1 if in intensive care 0 else and a columns with the age
     @Nicola2022
     """
+    #create the dataset to be appended
     keplan_meier_db=pd.DataFrame(columns=['ID_PER','Giorni','Eta','Intensiva'])
     
-    all_ID=set(df['ID_PER'])
-    
+    #search all the ID
+    all_ID=set(df['ID_RICOVERO'])
+    #divide them in the ID without intensive care
     ID_no_int=all_ID.difference(list_ID)
     
-    
+    #define patients that stayed only in intensive care or not in intensive care at all
     df_only_int=df[df['SETTING'] != 'TERAPIA INTENSIVA COVID']
-    df_only_int=df[~df['ID_PER'].isin(df_only_int['ID_PER'])]
-    ID_only_int=set(df_only_int['ID_PER'])
+    df_only_int=df[~df['ID_RICOVERO'].isin(df_only_int['ID_RICOVERO'])]
+    ID_only_int=set(df_only_int['ID_RICOVERO'])
     
     ID_no_mix=ID_only_int.union(ID_no_int)
     for x in ID_no_mix:
-        tempdf=df[df['ID_PER']==x]
+        tempdf=df[df['ID_RICOVERO']==x]
         first=tempdf.iloc[0]
         last=tempdf.iloc[-1]
         hosp_days=last['DATA_FINE']-first['DATA_ACCETTAZIONE']
         keplan_meier_db=keplan_meier_db.append({'ID_PER':x, 'Giorni':hosp_days, 'Eta':first['ETA']},ignore_index=True)
         
-    
+    #patients that had intensive care in the middle of hospitalization
     ID_mix=all_ID.difference(ID_no_mix)
     for x in ID_mix:
-        tempdf=df[df['ID_PER']==x]
+        tempdf=df[df['ID_RICOVERO']==x]
         tempdf.reset_index(drop=True, inplace=True)
         int_index=tempdf.index[tempdf['SETTING']=='TERAPIA INTENSIVA COVID'].tolist()
         first_occ_int=tempdf.iloc[int_index[0]]
@@ -56,7 +58,7 @@ def kaplan_meier_dataset(df,list_ID,sex_bolo):
         keplan_meier_db=keplan_meier_db.append({'ID_PER':x, 'Giorni':hosp_days, 'Eta':first_occ_int['ETA']},ignore_index=True)
 
            
-    #defining columns name and setting some variables as binary(sex and intensive care)  
+    #defining columns name and setting some variables as binary(sex and intensive care)   to use them in the KM analysis
     keplan_meier_db['Intensiva']=[1 if x in list_ID else 0 for x in keplan_meier_db['ID_PER']]
     keplan_meier_db[['ID_PER','Intensiva']]=keplan_meier_db[['ID_PER','Intensiva']].astype(int)
    
