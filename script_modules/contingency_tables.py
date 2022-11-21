@@ -25,12 +25,13 @@ def define_contingency_table_single(df, sett,table_name,patology=trial_list):
     @Nicola2022
     """
 
-    
+   
     set_int_results={}
     for ptlg in trial_list:
-        ispat,isint=ff.create_contingency_single(df,ptlg,sett)
-        contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,table_name)
-        set_int_results[ptlg] = [OR,p]
+         ispat=ff.create_contingency_pat(df,trial_list)
+         isint=ff.create_contingency_sett(df,[sett])
+         contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,table_name)
+         set_int_results[ptlg] = [OR,p]
     return(set_int_results)
        
     
@@ -50,7 +51,8 @@ def define_contingency_table_multiple(df, sett_list,table_name,patology=trial_li
      
     set_int_result={}
     for ptlg in trial_list:
-        ispat,isint = ff.create_contingency_multiple(df,ptlg,sett_list)
+        ispat=ff.create_contingency_pat(df,trial_list)
+        isint=ff.create_contingency_sett(df,sett_list)
         contingency, OR, p = ff.build_contingency(ispat,isint,ptlg,table_name)
         set_int_result[ptlg] = [OR,p]
         
